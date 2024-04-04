@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 import pytz
 import streamlit.components.v1 as components
 
+@st.cache_data
 def load_data(folder_path, address):
     all_dfs = []
     for filename in os.listdir(folder_path):
@@ -111,6 +112,7 @@ def create_sunburst_chart(dataframe):
     fig.update_layout(width=1000, height=1000)
     return fig
 
+@st.cache_data
 def get_recommendations(folder_path, voter):
     all_dfs = []
     for filename in os.listdir(folder_path):
