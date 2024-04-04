@@ -255,7 +255,7 @@ def main():
                         data-url="{custom_url}"
                         data-show-count="false"
                         data-size="Large" 
-                        height=100
+                        height=50
                         Tweet
                         </a>
                         <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
