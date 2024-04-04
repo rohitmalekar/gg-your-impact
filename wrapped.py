@@ -25,11 +25,21 @@ def create_cumulative_chart(final_df):
     quarterly_data['CumulativeDonations'] = quarterly_data['AmountUSD'].cumsum()
     quarterly_data['Quarter'] = quarterly_data['Quarter'].dt.start_time
 
+    # Format the CumulativeDonations for display: round to the nearest number and convert to currency format
+    quarterly_data['CumulativeDonationsText'] = quarterly_data['CumulativeDonations'].apply(lambda x: f"${x:,.0f}")
+
     fig = px.line(quarterly_data, x='Quarter', y='CumulativeDonations',
                   labels={'CumulativeDonations': 'Cumulative Donation Amount (USD)', 'Quarter': 'Quarter'},
-                  markers=True)
-    fig.update_layout(xaxis_title='Quarter', yaxis_title='Cumulative Donation Amount (USD)', yaxis=dict(range=[0, max(quarterly_data['CumulativeDonations'])*1.1]), width=800)
-    fig.update_traces(line=dict(color='#00433B'))
+                  markers=True,
+                  text='CumulativeDonationsText')  # Add text labels for each point
+
+    # Update layout and traces
+    fig.update_layout(xaxis_title='Quarter', yaxis_title='Cumulative Donation Amount (USD)',
+                      yaxis=dict(range=[0, max(quarterly_data['CumulativeDonations'])*1.1]), width=800)
+    
+    # Positioning the text labels on the top left of each marker
+    fig.update_traces(textposition='top left', line=dict(color='#00433B'))
+
     return fig
 
 def create_heatmap(final_df):
