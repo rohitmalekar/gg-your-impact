@@ -242,19 +242,23 @@ def main():
                     tcol2.markdown("### Impact Overview - Your Contribution Snapshot")
                     tcol2.markdown("We are grateful to have you with us in this journey. \
                                     Share Your Impact! Let the world know how you've contributed to the open-source ecosystem and more with Gitcoin Grants.")
+
+                    custom_url = f"https://gg-your-impact.streamlit.app/?address={address}"
+
+                    # Insert the custom URL into the HTML string using string formatting
+                    html_content = f"""
+                        <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" 
+                        data-text="Check my @gitcoin Grants Impact Dashboard" 
+                        data-url="{custom_url}"
+                        data-show-count="false">
+                        data-size="Large" 
+                        Tweet
+                        </a>
+                        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+                    """
+                    
                     with tcol2:
-                        components.html(
-                            """
-                                <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" 
-                                data-text="Check my @gitcoin Grants Impact Dashboard" 
-                                data-url="https://gg-your-impact.streamlit.app/"
-                                data-show-count="false">
-                                data-size="Large" 
-                                Tweet
-                                </a>
-                                <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-                            """
-                        )
+                        components.html(html_content)
                     qcol1, qcol2, qcol3, qcol4, qcol5, qcol6 = st.columns([1,2,2,2,2,1])    
                     
                     with qcol2:
