@@ -197,7 +197,7 @@ def main():
     lookup_df['Start Date'] = pd.to_datetime(lookup_df['Start Date']).dt.tz_localize(None)
     lookup_df['End Date'] = pd.to_datetime(lookup_df['End Date']).dt.tz_localize(None)
 
-    query_params = st.query_params('address')
+    query_params = st.query_params.get_all('address')
 
     if len(query_params) == 1:
         address = query_params[0]
