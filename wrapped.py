@@ -242,6 +242,7 @@ def main():
                     unique_payout_addresses = final_df['PayoutAddress'].nunique()
 
                     st.balloons()
+                    tcol2.markdown("#")
                     tcol2.success("### Impact Overview - Your Contribution Snapshot")
                     tcol2.markdown("We are grateful to have you with us in this journey. \
                                     Each contribution you've made fuels the collective vision. \
@@ -270,6 +271,7 @@ def main():
                         
                     # Display Treemap of Projects
                     with tcol2:
+                        st.markdown("#")
                         st.success("### Contribution Timeline - Evolution of Your Impact")
                         st.caption("To download the chart as an image, hover over the chart and click 📷 icon on top right")
                         st.plotly_chart(create_cumulative_chart(final_df))
