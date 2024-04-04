@@ -253,8 +253,9 @@ def main():
                         <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" 
                         data-text="Check my @gitcoin Grants Impact Dashboard" 
                         data-url="{custom_url}"
-                        data-show-count="false">
+                        data-show-count="false"
                         data-size="Large" 
+                        height=100
                         Tweet
                         </a>
                         <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
