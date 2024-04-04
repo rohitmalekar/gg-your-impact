@@ -265,26 +265,26 @@ def main():
                     tcol1,tcol2,tcol3 = st.columns([1,3,1])
 
                     if sum_amount_usd_not_ggrant > 0:
-                        tcol2.info('Alongside your contributions to Gitcoin Grants, you\'ve also made additional donations of $' + str(round(sum_amount_usd_not_ggrant,0)) + \
-                                   ' towards community rounds on Grants Stack', icon="ℹ️")
+                        tcol2.caption('ℹ️ Alongside your contributions to Gitcoin Grants, you\'ve also made additional donations of $' + str(round(sum_amount_usd_not_ggrant,0)) + \
+                                   ' towards community rounds on Grants Stack')
                         
                     # Display Treemap of Projects
                     with tcol2:
-                        st.markdown("### Contribution Timeline - Evolution of Your Impact")
+                        st.success("### Contribution Timeline - Evolution of Your Impact")
                         st.caption("To download the chart as an image, hover over the chart and click 📷 icon on top right")
                         st.plotly_chart(create_cumulative_chart(final_df))
 
                         #st.plotly_chart(create_heatmap(final_df))
-                        st.markdown("### Support Landscape - Grantees You Backed")
+                        st.success("### Support Landscape - Grantees You Backed")
                         st.caption("To download the chart as an image, hover over the chart and click 📷 icon on top right")
                         st.plotly_chart(display_top_projects_treemap(final_df), use_container_width=True)
                         
-                        st.markdown("### Contribution Burst - Exploration of Your Impact")
+                        st.success("### Contribution Burst - Exploration of Your Impact")
                         st.caption("Click on any round to drill-down and drill-up. To download the chart as an image, hover over the chart and click 📷 icon on top right")
                         st.plotly_chart(create_sunburst_chart(final_df), use_container_width=True)
 
                         # Display Donation History    
-                        st.markdown("### Journey of Giving - Your Detailed Donation History")
+                        st.success("### Journey of Giving - Your Detailed Donation History")
                         st.caption("Click on the download button to save as .csv file")
                         display_df = display_donation_history(final_df)
                         st.dataframe(display_df, hide_index=True, use_container_width=True)
@@ -298,7 +298,7 @@ def main():
                         )
 
                         # Filter the DataFrame for rows where 'GG' is 'N'
-                        st.markdown("#### Top Supported Rounds Beyond Gitcoin Grants")
+                        st.success("### Top Supported Rounds Beyond Gitcoin Grants")
                         grouped_df = all_df.groupby(['Round Name', 'GG'])['AmountUSD'].sum().reset_index()
                         not_gg_df = grouped_df[grouped_df['GG'] == 'N']
 
@@ -311,7 +311,7 @@ def main():
                         my_bar.progress(70,"🫡 thank you for your support to Gitcoin Grants. Check out your stats below while we build your personalized recommendations list for future rounds!")
                         # Recommendations
                         recommendations = get_recommendations(folder_path, address)
-                        st.markdown("#### Curated Opportunities: Your Next Potential Grantees")
+                        st.success("### Curated Opportunities: Your Next Potential Grantees")
                         st.caption("We pulled a list of recommended grantees for you based on contributors' choices who support the projects you support the most")
                         st.dataframe(recommendations, hide_index=True, use_container_width=True)
 
