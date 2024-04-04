@@ -242,7 +242,7 @@ def main():
                     unique_payout_addresses = final_df['PayoutAddress'].nunique()
 
                     st.balloons()
-                    tcol2.markdown("### Impact Overview - Your Contribution Snapshot")
+                    tcol2.success("### Impact Overview - Your Contribution Snapshot")
                     tcol2.markdown("We are grateful to have you with us in this journey. \
                                     Each contribution you've made fuels the collective vision. \
                                     Here's a glimpse into the impact you've created:")
@@ -319,7 +319,7 @@ def main():
 
                         custom_url = f"https://gg-your-impact.streamlit.app/?address={address}"
 
-                        st.markdown("🌟 *Share Your Impact!* 🌍 Let the world know how you've contributed to the open-source ecosystem and beyond with Gitcoin Grants. Inspire others with your journey! 💫")
+                        st.markdown("🌟 **Share Your Impact!** 🌍 Let the world know how you've contributed to the open-source ecosystem and beyond with Gitcoin Grants. Inspire others with your journey! 💫")
                         # Insert the custom URL into the HTML string using string formatting
                         html_content = f"""
                             <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" 
