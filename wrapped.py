@@ -244,25 +244,9 @@ def main():
                     st.balloons()
                     tcol2.markdown("### Impact Overview - Your Contribution Snapshot")
                     tcol2.markdown("We are grateful to have you with us in this journey. \
-                                    Share Your Impact! Let the world know how you've contributed to the open-source ecosystem and more with Gitcoin Grants.")
+                                    Each contribution you've made fuels the collective vision. \
+                                    Here's a glimpse into the impact you've created:")
 
-                    custom_url = f"https://gg-your-impact.streamlit.app/?address={address}"
-
-                    # Insert the custom URL into the HTML string using string formatting
-                    html_content = f"""
-                        <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" 
-                        data-text="Check my @gitcoin Grants Impact Dashboard" 
-                        data-url="{custom_url}"
-                        data-show-count="false"
-                        data-size="Large" 
-                        height=10
-                        Tweet
-                        </a>
-                        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-                    """
-                    
-                    with tcol2:
-                        components.html(html_content)
                     qcol1, qcol2, qcol3, qcol4, qcol5, qcol6 = st.columns([1,2,2,2,2,1])    
                     
                     with qcol2:
@@ -332,6 +316,25 @@ def main():
                         st.dataframe(recommendations, hide_index=True, use_container_width=True)
 
                         my_bar.empty()
+
+                        custom_url = f"https://gg-your-impact.streamlit.app/?address={address}"
+
+                        st.markdown("Share Your Impact! Let the world know how you've contributed to the open-source ecosystem and more with Gitcoin Grants.")
+                        # Insert the custom URL into the HTML string using string formatting
+                        html_content = f"""
+                            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" 
+                            data-text="Check my @gitcoin Grants Impact Dashboard" 
+                            data-url="{custom_url}"
+                            data-show-count="false"
+                            data-size="Large" 
+                            height=10
+                            Tweet
+                            </a>
+                            <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+                        """
+                        
+                        with tcol2:
+                            components.html(html_content)
 
                 else:
                     my_bar.empty()
