@@ -259,18 +259,22 @@ def main():
                         cont4 = st.container(border=True)
                         cont4.metric(label="Your contribution count", value=num_rows)                        
 
-                    components.html(
-                        """
-                            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" 
-                            data-text="Check my @gitcoin Grants Impact Dashboard" 
-                            data-url="https://gg-your-impact.streamlit.app/"
-                            data-show-count="false">
-                            data-size="Large" 
-                            Tweet
-                            </a>
-                            <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-                        """
-                    )
+                    tcol2.markdown("### Impact Overview - Your Contribution Snapshot")
+                    tcol2.markdown("We are grateful to have you with us in this journey \
+                                    Share Your Impact! Let the world know how you've contributed to the open-source ecosystem and more with Gitcoin Grants.")
+                    with tcol2:
+                        components.html(
+                            """
+                                <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" 
+                                data-text="Check my @gitcoin Grants Impact Dashboard" 
+                                data-url="https://gg-your-impact.streamlit.app/"
+                                data-show-count="false">
+                                data-size="Large" 
+                                Tweet
+                                </a>
+                                <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+                            """
+                        )
                     
                     tcol1,tcol2,tcol3 = st.columns([1,3,1])
 
