@@ -313,6 +313,9 @@ def main():
 
                         # Filter the DataFrame for rows where 'GG' is 'N'
                         st.success("### Top Supported Rounds Beyond Gitcoin Grants")
+                        st.caption("Gitcoin 2.0 allows any EVM community to allocate capital in a transparent and democratic way.\
+                        These are the top rounds you contributed to outside of Gitcoin Grants. \
+                        To learn more about Gitcoin 2.0, read our whitepaper [here](https://www.gitcoin.co/whitepaper)")
                         grouped_df = all_df.groupby(['Round Name', 'GG'])['AmountUSD'].sum().reset_index()
                         not_gg_df = grouped_df[grouped_df['GG'] == 'N']
 
