@@ -319,7 +319,7 @@ def main():
 
                         custom_url = f"https://gg-your-impact.streamlit.app/?address={address}"
 
-                        st.markdown("Share Your Impact! Let the world know how you've contributed to the open-source ecosystem and more with Gitcoin Grants.")
+                        st.markdown("🌟 *Share Your Impact!* 🌍 Let the world know how you've contributed to the open-source ecosystem and beyond with Gitcoin Grants. Inspire others with your journey! 💫")
                         # Insert the custom URL into the HTML string using string formatting
                         html_content = f"""
                             <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" 
