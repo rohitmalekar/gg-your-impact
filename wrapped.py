@@ -312,6 +312,7 @@ def main():
                         )
 
                         # Filter the DataFrame for rows where 'GG' is 'N'
+                        st.markdown("#")
                         st.success("### Top Supported Rounds Beyond Gitcoin Grants")
                         st.caption("Gitcoin 2.0 allows any EVM community to allocate capital in a transparent and democratic way.\
                         These are the top rounds you contributed to outside of Gitcoin Grants. \
@@ -328,6 +329,7 @@ def main():
                         my_bar.progress(70,"🫡 thank you for your support to Gitcoin Grants. Check out your stats below while we build your personalized recommendations list for future rounds!")
                         # Recommendations
                         recommendations = get_recommendations(folder_path, address)
+                        st.markdown("#")
                         st.success("### Curated Opportunities: Your Next Potential Grantees")
                         st.caption("We pulled a list of recommended grantees for you based on contributors' choices who support the projects you support the most")
                         st.dataframe(recommendations, hide_index=True, use_container_width=True)
