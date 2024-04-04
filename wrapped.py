@@ -76,11 +76,12 @@ def display_top_projects_treemap(final_df):
     
     # Adding a new column that combines 'Project Name' and 'AmountUSD' for display
     project_donations['Label'] = project_donations.apply(lambda row: f"{row['Project Name']} (${row['AmountUSD']:,.2f})", axis=1)
-    
+    top_projects = project_donations.sort_values('AmountUSD', ascending=False)
+
     # Creating a treemap
     custom_colors = ['#00433b', '#c1eaff', '#edfeda', '#4fb8ef']
     fig = px.treemap(
-        project_donations, 
+        top_projects, 
         path=[px.Constant('All Projects'), 'Label'],  # Use the new 'Label' for path to show both name and amount
         values='AmountUSD',
         color_continuous_scale=custom_colors
