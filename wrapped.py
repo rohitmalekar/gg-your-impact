@@ -255,14 +255,14 @@ def main():
                         data-url="{custom_url}"
                         data-show-count="false"
                         data-size="Large" 
-                        height=50
+                        height=10
                         Tweet
                         </a>
                         <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
                     """
                     
-                    #with tcol2:
-                    #    components.html(html_content)
+                    with tcol2:
+                        components.html(html_content)
                     qcol1, qcol2, qcol3, qcol4, qcol5, qcol6 = st.columns([1,2,2,2,2,1])    
                     
                     with qcol2:
