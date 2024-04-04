@@ -119,7 +119,7 @@ def get_recommendations(folder_path, voter):
             df = pd.read_csv(os.path.join(folder_path, filename))
             all_dfs.append(df)
 
-    GG_round_addresses_df = pd.read_csv('./Gitcoin Wrapped/GS GG Rounds.csv')
+    GG_round_addresses_df = pd.read_csv('./GS GG Rounds.csv')
 
     all_data = pd.concat(all_dfs, ignore_index=True)
     # Convert 'Voter' to lowercase for case-insensitive comparison
@@ -192,8 +192,8 @@ def main():
     tcol2.title('Gitcoin Grants Impact Dashboard')
     tcol2.markdown('### Your support for Gitcoin Grants has a story. Let\'s reveal it together.')
         
-    folder_path = './Gitcoin Wrapped/data'
-    lookup_df = pd.read_csv('./Gitcoin Wrapped/GS GG Rounds.csv')
+    folder_path = './data'
+    lookup_df = pd.read_csv('./GS GG Rounds.csv')
     lookup_df['Start Date'] = pd.to_datetime(lookup_df['Start Date']).dt.tz_localize(None)
     lookup_df['End Date'] = pd.to_datetime(lookup_df['End Date']).dt.tz_localize(None)
 
