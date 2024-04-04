@@ -7,8 +7,7 @@ import os
 import re
 from datetime import datetime, timedelta
 import pytz
-
-    
+import streamlit.components.v1 as components
 
 def load_data(folder_path, address):
     all_dfs = []
@@ -259,7 +258,20 @@ def main():
                         st.markdown('#')
                         cont4 = st.container(border=True)
                         cont4.metric(label="Your contribution count", value=num_rows)                        
-                
+
+                    components.html(
+                        """
+                            <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" 
+                            data-text="Check my @gitcoin Grants Impact Dashboard" 
+                            data-url="https://gg-your-impact.streamlit.app/"
+                            data-show-count="false">
+                            data-size="Large" 
+                            Tweet
+                            </a>
+                            <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+                        """
+                    )
+                    
                     tcol1,tcol2,tcol3 = st.columns([1,3,1])
 
                     if sum_amount_usd_not_ggrant > 0:
