@@ -238,27 +238,7 @@ def main():
                     num_rows = final_df.shape[0]
                     unique_payout_addresses = final_df['PayoutAddress'].nunique()
 
-                    qcol1, qcol2, qcol3, qcol4, qcol5, qcol6 = st.columns([1,2,2,2,2,1])    
-
                     st.balloons()
-
-                    with qcol2:
-                        st.markdown('#')
-                        cont1 = st.container(border=True)
-                        cont1.metric(label="Your Gitcoin Grants debut was on", value=earliest_tx_timestamp.strftime('%d-%b-%Y'))
-                    with qcol3:
-                        st.markdown('#')
-                        cont2 = st.container(border=True)
-                        cont2.metric(label="Grantees you have empowered", value=unique_payout_addresses)
-                    with qcol4:
-                        st.markdown('#')
-                        cont3 = st.container(border=True)
-                        cont3.metric(label="Your total impact", value="${:,.0f}".format(sum_amount_usd))
-                    with qcol5:    
-                        st.markdown('#')
-                        cont4 = st.container(border=True)
-                        cont4.metric(label="Your contribution count", value=num_rows)                        
-
                     tcol2.markdown("### Impact Overview - Your Contribution Snapshot")
                     tcol2.markdown("We are grateful to have you with us in this journey \
                                     Share Your Impact! Let the world know how you've contributed to the open-source ecosystem and more with Gitcoin Grants.")
@@ -275,6 +255,24 @@ def main():
                                 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
                             """
                         )
+                    qcol1, qcol2, qcol3, qcol4, qcol5, qcol6 = st.columns([1,2,2,2,2,1])    
+                    
+                    with qcol2:
+                        st.markdown('#')
+                        cont1 = st.container(border=True)
+                        cont1.metric(label="Your Gitcoin Grants debut was on", value=earliest_tx_timestamp.strftime('%d-%b-%Y'))
+                    with qcol3:
+                        st.markdown('#')
+                        cont2 = st.container(border=True)
+                        cont2.metric(label="Grantees you have empowered", value=unique_payout_addresses)
+                    with qcol4:
+                        st.markdown('#')
+                        cont3 = st.container(border=True)
+                        cont3.metric(label="Your total impact", value="${:,.0f}".format(sum_amount_usd))
+                    with qcol5:    
+                        st.markdown('#')
+                        cont4 = st.container(border=True)
+                        cont4.metric(label="Your contribution count", value=num_rows)                        
                     
                     tcol1,tcol2,tcol3 = st.columns([1,3,1])
 
