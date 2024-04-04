@@ -123,6 +123,7 @@ def get_recommendations(folder_path, voter):
     all_data = pd.concat(all_dfs, ignore_index=True)
     # Convert 'Voter' to lowercase for case-insensitive comparison
     df_lower = all_data.copy()
+    del all_data
     df_lower['Voter'] = df_lower['Voter'].str.lower()
     df_lower['Tx Timestamp'] = pd.to_datetime(df_lower['Tx Timestamp'],format='mixed')
 
