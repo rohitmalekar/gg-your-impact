@@ -83,7 +83,6 @@ def display_top_projects_treemap(final_df):
         project_donations, 
         path=[px.Constant('All Projects'), 'Label'],  # Use the new 'Label' for path to show both name and amount
         values='AmountUSD',
-        color='AmountUSD',  # Color can still be based on 'AmountUSD'
         color_continuous_scale=custom_colors
     )
 
