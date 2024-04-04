@@ -74,17 +74,19 @@ def display_top_projects_treemap(final_df):
     # Grouping by 'Project Name' and summing up 'AmountUSD'
     project_donations = final_df.groupby('Project Name').agg({'AmountUSD': 'sum'}).reset_index()
     
-    # Sorting to get top projects by donation amount - though for a treemap, you might not need to limit to top 10
-    top_projects = project_donations.sort_values('AmountUSD', ascending=False)
-
+    # Adding a new column that combines 'Project Name' and 'AmountUSD' for display
+    project_donations['Label'] = project_donations.apply(lambda row: f"{row['Project Name']} (${row['AmountUSD']:,.2f})", axis=1)
+    
     # Creating a treemap
-    custom_colors = ['#00433b','#c1eaff','#edfeda','#edfeda','#4fb8ef']
+    custom_colors = ['#00433b', '#c1eaff', '#edfeda', '#4fb8ef']
     fig = px.treemap(
-        top_projects, 
-        path=[px.Constant('All Projects'), 'Project Name'],  # Root node and branching
+        project_donations, 
+        path=[px.Constant('All Projects'), 'Label'],  # Use the new 'Label' for path to show both name and amount
         values='AmountUSD',
-        color_discrete_sequence=custom_colors
+        color='AmountUSD',  # Color can still be based on 'AmountUSD'
+        color_continuous_scale=custom_colors
     )
+
     fig.update_layout(width=750, height=750)
     return fig
 
