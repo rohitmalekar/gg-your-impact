@@ -9,6 +9,14 @@ from datetime import datetime, timedelta
 import pytz
 import streamlit.components.v1 as components
 
+def open_page(url):
+    open_script= """
+        <script type="text/javascript">
+            window.open('%s', '_self').focus();
+        </script>
+    """ % (url)
+    html(open_script)
+
 @st.cache_data
 def load_data(folder_path, address):
     all_dfs = []
@@ -224,7 +232,7 @@ def main():
         address = tcol2.text_input('Enter your Ethereum address below to uncover your unique impact story (starting "0x"):', 
                                          help='ENS not supported, please enter 42-character hexadecimal address starting with "0x"')
 
-    tcol2.markdown('<a href="/?address=" target="_self">Reset</a>',unsafe_allow_html=True)
+    st.button('Reset', on_click=open_page, args=('https://gg-your-impact.streamlit.app/',))
     if address and address != 'None':
         my_bar = tcol2.progress(0, text='Looking up! Please wait.')
         if not re.match(r'^(0x)?[0-9a-f]{40}$', address, flags=re.IGNORECASE):
