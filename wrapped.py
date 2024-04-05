@@ -244,7 +244,7 @@ def main():
         st.session_state.address = address_input
     
     # Check if address is provided in the URL
-    query_params = st.experimental_get_query_params()
+    query_params = st.query_params.get_all('address')
     if 'address' in query_params and len(query_params) == 1 and not st.session_state.address:
         # Set the initial address from the URL in session state
         st.session_state.address = query_params[0]
