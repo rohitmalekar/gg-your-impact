@@ -221,6 +221,7 @@ def main():
 
     if len(query_params) == 1 and not st.session_state.address:
         st.session_state.address = query_params[0]
+        address_input = query_params[0]
         tcol2.text_input('Enter your Ethereum address below to uncover your unique impact story (starting "0x"):', 
                                    value = query_params[0],
                                    help='ENS not supported, please enter 42-character hexadecimal address starting with "0x"')    
