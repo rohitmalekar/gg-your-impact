@@ -261,6 +261,8 @@ def main():
     if address_input != st.session_state.address:
         update_address()
 
+    # Now, use the address from the session state for further processing
+    address = st.session_state.address
 
     #tcol2.button('Reset', on_click=open_page, args=('https://gg-your-impact.streamlit.app/',))
     if address and address != 'None':
