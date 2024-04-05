@@ -222,18 +222,17 @@ def main():
     lookup_df['Start Date'] = pd.to_datetime(lookup_df['Start Date']).dt.tz_localize(None)
     lookup_df['End Date'] = pd.to_datetime(lookup_df['End Date']).dt.tz_localize(None)
 
-    """
-    query_params = st.query_params.get_all('address')
+    
+    #query_params = st.query_params.get_all('address')
 
-    if len(query_params) == 1:
-        address = query_params[0]
-        tcol2.text_input('Enter your Ethereum address below to uncover your unique impact story (starting "0x"):', 
-                                   value = query_params[0],
-                                   help='ENS not supported, please enter 42-character hexadecimal address starting with "0x"')    
-    else:
-        address = tcol2.text_input('Enter your Ethereum address below to uncover your unique impact story (starting "0x"):', 
-                                         help='ENS not supported, please enter 42-character hexadecimal address starting with "0x"')
-    """
+    #if len(query_params) == 1:
+    #    address = query_params[0]
+    #    tcol2.text_input('Enter your Ethereum address below to uncover your unique impact story (starting "0x"):', 
+    #                               value = query_params[0],
+    #                               help='ENS not supported, please enter 42-character hexadecimal address starting with "0x"')    
+    #else:
+    #    address = tcol2.text_input('Enter your Ethereum address below to uncover your unique impact story (starting "0x"):', 
+    #                                     help='ENS not supported, please enter 42-character hexadecimal address starting with "0x"')
 
     # Initialize session state for address if not already set
     if 'address' not in st.session_state:
