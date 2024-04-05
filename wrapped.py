@@ -238,10 +238,6 @@ def main():
     if 'address' not in st.session_state:
         st.session_state.address = None
     
-    # Function to update address in session state when input changes
-    def update_address():
-        st.session_state.address = address_input
-    
     # Check if address is provided in the URL
     query_params = st.query_params.get_all('address')
     if len(query_params) == 1 and not st.session_state.address:
@@ -252,14 +248,10 @@ def main():
     address_input = tcol2.text_input(
         'Enter your Ethereum address below to uncover your unique impact story (starting "0x"):', 
         value = st.session_state.address or '',
-        on_change = update_address,
+        key='address',
         help='ENS not supported, please enter 42-character hexadecimal address starting with "0x"'
         )
     
-    # Update the address in session state if user changes it
-    if address_input != st.session_state.address:
-        update_address()
-
     # Now, use the address from the session state for further processing
     address = st.session_state.address
 
