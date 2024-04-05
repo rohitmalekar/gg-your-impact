@@ -222,6 +222,7 @@ def main():
     lookup_df['Start Date'] = pd.to_datetime(lookup_df['Start Date']).dt.tz_localize(None)
     lookup_df['End Date'] = pd.to_datetime(lookup_df['End Date']).dt.tz_localize(None)
 
+    """
     query_params = st.query_params.get_all('address')
 
     if len(query_params) == 1:
@@ -232,6 +233,34 @@ def main():
     else:
         address = tcol2.text_input('Enter your Ethereum address below to uncover your unique impact story (starting "0x"):', 
                                          help='ENS not supported, please enter 42-character hexadecimal address starting with "0x"')
+    """
+
+    # Initialize session state for address if not already set
+    if 'address' not in st.session_state:
+        st.session_state.address = None
+    
+    # Function to update address in session state when input changes
+    def update_address():
+        st.session_state.address = address_input
+    
+    # Check if address is provided in the URL
+    query_params = st.experimental_get_query_params()
+    if 'address' in query_params and len(query_params) == 1 and not st.session_state.address:
+        # Set the initial address from the URL in session state
+        st.session_state.address = query_params[0]
+    
+    # Create an input field for the address - it uses the session state address or updates it
+    address_input = tcol2.text_input(
+        'Enter your Ethereum address below to uncover your unique impact story (starting "0x"):', 
+        value=st.session_state.address or '', 
+        on_change=update_address,
+        help='ENS not supported, please enter 42-character hexadecimal address starting with "0x"'
+    )
+    
+    # Update the address in session state if user changes it
+    if address_input != st.session_state.address:
+        update_address()
+
 
     #tcol2.button('Reset', on_click=open_page, args=('https://gg-your-impact.streamlit.app/',))
     if address and address != 'None':
