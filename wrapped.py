@@ -197,9 +197,7 @@ def get_recommendations(folder_path, voter):
 
     return recommended_projects[['Project Name']]
 
-# Function to update address in session state when input changes
-def update_address():
-    st.session_state.address = address_input
+    
 
 # Main function to orchestrate the workflow
 def main():
@@ -231,7 +229,7 @@ def main():
 
     # Update the address in session state if user changes it
     if address_input != st.session_state.address:
-        update_address()
+        st.session_state.address = address_input
         
     # Now, use the address from the session state for further processing
     address = st.session_state.address
