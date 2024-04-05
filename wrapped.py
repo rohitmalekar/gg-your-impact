@@ -224,8 +224,6 @@ def main():
         address = tcol2.text_input('Enter your Ethereum address below to uncover your unique impact story (starting "0x"):', 
                                          help='ENS not supported, please enter 42-character hexadecimal address starting with "0x"')
 
-    tcol2.st.link_button("Reset", "https://gg-your-impact.streamlit.app")
-
     if address and address != 'None':
         my_bar = tcol2.progress(0, text='Looking up! Please wait.')
         if not re.match(r'^(0x)?[0-9a-f]{40}$', address, flags=re.IGNORECASE):
