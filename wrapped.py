@@ -213,23 +213,18 @@ def main():
     lookup_df['Start Date'] = pd.to_datetime(lookup_df['Start Date']).dt.tz_localize(None)
     lookup_df['End Date'] = pd.to_datetime(lookup_df['End Date']).dt.tz_localize(None)
 
-    # Initialize session state for address if not already set
-    if 'address' not in st.session_state:
-        st.session_state.address = None
-
     query_params = st.query_params.get_all('address')
 
-    if len(query_params) == 1 and not st.session_state.address:
-        st.session_state.address = query_params[0]
+    if len(query_params) == 1:
+        address = query_params[0]
         tcol2.text_input('Enter your Ethereum address below to uncover your unique impact story (starting "0x"):', 
                                    value = query_params[0],
                                    help='ENS not supported, please enter 42-character hexadecimal address starting with "0x"')    
     else:
-        st.session_state.address = tcol2.text_input('Enter your Ethereum address below to uncover your unique impact story (starting "0x"):', 
+        address = tcol2.text_input('Enter your Ethereum address below to uncover your unique impact story (starting "0x"):', 
                                          help='ENS not supported, please enter 42-character hexadecimal address starting with "0x"')
-        
-    # Now, use the address from the session state for further processing
-    address = st.session_state.address
+
+    tcol2.st.link_button("Reset", "https://gg-your-impact.streamlit.app")
 
     if address and address != 'None':
         my_bar = tcol2.progress(0, text='Looking up! Please wait.')
