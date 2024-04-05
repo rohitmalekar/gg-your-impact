@@ -252,7 +252,6 @@ def main():
     address_input = tcol2.text_input(
         'Enter your Ethereum address below to uncover your unique impact story (starting "0x"):', 
         value=st.session_state.address or '', 
-        on_change=update_address,
         help='ENS not supported, please enter 42-character hexadecimal address starting with "0x"'
     )
     
