@@ -221,15 +221,16 @@ def main():
 
     if len(query_params) == 1 and not st.session_state.address:
         st.session_state.address = query_params[0]
-        address_input = query_params[0]
         tcol2.text_input('Enter your Ethereum address below to uncover your unique impact story (starting "0x"):', 
                                    value = query_params[0],
                                    help='ENS not supported, please enter 42-character hexadecimal address starting with "0x"')    
     else:
-        address_input = tcol2.text_input('Enter your Ethereum address below to uncover your unique impact story (starting "0x"):', help='ENS not supported, please enter 42-character hexadecimal address starting with "0x"')
+        address_input = tcol2.text_input('Enter your Ethereum address below to uncover your unique impact story (starting "0x"):', 
+                                         value=st.session_state['address'],
+                                         help='ENS not supported, please enter 42-character hexadecimal address starting with "0x"')
 
     # Update the address in session state if user changes it
-    if address_input != st.session_state.address:
+    if address_input and address_input != st.session_state.address:
         st.session_state.address = address_input
         
     # Now, use the address from the session state for further processing
