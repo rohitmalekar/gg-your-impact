@@ -320,7 +320,7 @@ def main():
                     
                     custom_url = f"http://16.171.237.112:8501/?address={address}"
 
-                    st.markdown("🌟 **Share Your Impact!** 🌍 Let the world know how you've contributed to the open-source ecosystem and beyond with Gitcoin Grants. Inspire others with your journey! 💫")
+                    tcol2.markdown("🌟 **Share Your Impact!** 🌍 Let the world know how you've contributed to the open-source ecosystem and beyond with Gitcoin Grants. Inspire others with your journey! 💫")
                     # Insert the custom URL into the HTML string using string formatting
                     html_content = f"""
                         <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" 
