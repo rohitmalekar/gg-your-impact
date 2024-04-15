@@ -295,7 +295,7 @@ def main():
                                     Each contribution you've made fuels the collective vision. \
                                     Here's a glimpse into the impact you've created:")
 
-                    qcol1, qcol2, qcol3, qcol4, qcol5, qcol6 = st.columns([1,2,2,2,2,1])    
+                    qcol1, qcol2, qcol3, qcol4 = st.columns([2,3,3,2])    
                     
                     with qcol2:
                         cont1 = st.container(border=True)
@@ -303,10 +303,10 @@ def main():
                     with qcol3:
                         cont2 = st.container(border=True)
                         cont2.metric(label="Grantees you have empowered", value=unique_payout_addresses)
-                    with qcol4:
+                    with qcol2:
                         cont3 = st.container(border=True)
                         cont3.metric(label="Your total impact", value="${:,.0f}".format(sum_amount_usd))
-                    with qcol5:    
+                    with qcol3:    
                         cont4 = st.container(border=True)
                         cont4.metric(label="Your contribution count", value=num_rows)                        
                     
