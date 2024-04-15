@@ -162,7 +162,7 @@ def get_recommendations(folder_path, voter):
 
     voter_lower = voter.lower()
 
-    # Step 1
+    # Step 1: Find the 3 most supported projects by the user
     top_addresses = df_lower[df_lower['Voter'] == voter_lower].groupby('PayoutAddress').agg({'AmountUSD': 'sum'}).reset_index().sort_values('AmountUSD', ascending=False).head(3)
     #st.write("Step 1: Top Addresses")
     #st.dataframe(top_addresses)
@@ -178,7 +178,6 @@ def get_recommendations(folder_path, voter):
     #st.write("Step 2: Other Voters in the Last 12 Months")
     #st.dataframe(unique_other_voters)
 
-    # Proceeding with steps as they are if they're suitable for your context
     # Step 3
     # Filter the DataFrame to include only rows from unique other voters
     filtered_by_voters = df_lower[df_lower['Voter'].isin(unique_other_voters)]
@@ -388,7 +387,8 @@ def main():
                         recommendations = get_recommendations(folder_path, address)
                         st.markdown("#")
                         st.success("### Curated Opportunities: Your Next Potential Grantees")
-                        st.caption("We pulled a list of recommended grantees for you based on contributors' choices who support the projects you support the most")
+                        st.caption("We pulled a list of recommended grantees for you based on contributors' choices who support the projects you support the most.")
+                        st.caption("The projects listed below have received the most support from donors over the last 12 months, who also contributed to the top three projects you have most supported.")
                         st.dataframe(recommendations, hide_index=True, use_container_width=True)
 
                         my_bar.empty()
