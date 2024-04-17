@@ -312,8 +312,9 @@ def main():
                     tcol1,tcol2,tcol3 = st.columns([1,3,1])
 
                     if sum_amount_usd_not_ggrant > 0:
-                        tcol2.caption('ℹ️ Alongside your contributions to Gitcoin Grants, you\'ve also made additional donations of $' + str(round(sum_amount_usd_not_ggrant,0)) + \
-                                   ' towards community rounds on Grants Stack')
+                        tcol2.caption('ℹ️ In addition to your contributions to Gitcoin Grants, you have donated $' + str(round(sum_amount_usd_not_ggrant,0)) + \
+                                   ' in separate rounds organized by communities using Grants Stack and Allo for their funding decisions. \
+                                   These donations were made outside of the Gitcoin Grants rounds.')
 
                     # Social Sharing
                     
