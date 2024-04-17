@@ -220,7 +220,7 @@ def main():
     lookup_df = pd.read_csv('./GS GG Rounds.csv')
     lookup_df['Start Date'] = pd.to_datetime(lookup_df['Start Date']).dt.tz_localize(None)
     lookup_df['End Date'] = pd.to_datetime(lookup_df['End Date']).dt.tz_localize(None)
-
+    lookup_df['ID'] = lookup_df['ID'].str.lower()
     
     #query_params = st.query_params.get_all('address')
 
