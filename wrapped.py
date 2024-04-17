@@ -324,7 +324,7 @@ def main():
                     # Insert the custom URL into the HTML string using string formatting
                     html_content = f"""
                         <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" 
-                        data-text="Join me in enabling communities to fund their shared needs. Check my @gitcoin Grants Impact Dashboard: "
+                        data-text="I\'ve been a part of curating and signaling the next generation of high-impact projects through @gitcoin Grants 🫡 Join me and share your impact today! Check out my #ggwrapped Impact Dashboard " 
                         data-url="{custom_url}"
                         data-show-count="false"
                         data-size="Large" 
@@ -400,7 +400,7 @@ def main():
                         # Insert the custom URL into the HTML string using string formatting
                         html_content = f"""
                             <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" 
-                            data-text="Join me in enabling communities to fund their shared needs. Check my @gitcoin Grants Impact Dashboard: " 
+                            data-text="I\'ve been a part of curating and signaling the next generation of high-impact projects through @gitcoin Grants 🫡 Join me and share your impact today! Check out my #ggwrapped Impact Dashboard " 
                             data-url="{custom_url}"
                             data-show-count="false"
                             data-size="Large" 
