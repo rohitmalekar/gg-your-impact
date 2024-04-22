@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 import pytz
 import streamlit.components.v1 as components
 from streamlit.components.v1 import HTML
+import psycopg2 as pg
 
 # Now you can use os.getenv to access your variables
 db_host= os.environ['DB_HOST']
