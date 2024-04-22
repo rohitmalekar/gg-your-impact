@@ -11,11 +11,11 @@ import streamlit.components.v1 as components
 import psycopg2 as pg
 
 # Now you can use os.getenv to access your variables
-db_host= os.environ['DB_HOST']
-db_port = os.environ['DB_PORT']
-db_name = os.environ['DB_NAME']
-db_username = os.environ['DB_USERNAME']
-db_password = os.environ['DB_PASSWORD']
+db_host= st.secrets['DB_HOST']
+db_port = st.secrets['DB_PORT']
+db_name = st.secrets['DB_NAME']
+db_username = st.secrets['DB_USERNAME']
+db_password = st.secrets['DB_PASSWORD']
 
 @st.cache_data
 def load_data(folder_path, address):
