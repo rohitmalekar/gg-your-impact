@@ -26,7 +26,7 @@ def load_data(folder_path, address):
             df = pd.read_csv(os.path.join(folder_path, filename))
             filtered_df = df[df['Voter'].str.lower() == address.lower()]
             all_dfs.append(filtered_df)
-    return pd.concat(all_dfs, ignore_index=True) if not all_dfs.empty else pd.DataFrame()
+    return all_dfs if not all_dfs.empty else pd.DataFrame()
 
 def create_cumulative_chart(final_df):
     final_df['Quarter'] = final_df['Tx Timestamp'].dt.to_period("Q")
