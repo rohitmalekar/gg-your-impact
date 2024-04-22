@@ -8,7 +8,6 @@ import re
 from datetime import datetime, timedelta
 import pytz
 import streamlit.components.v1 as components
-from streamlit.components.v1 import HTML
 import psycopg2 as pg
 
 # Now you can use os.getenv to access your variables
@@ -17,14 +16,6 @@ db_port = os.environ['DB_PORT']
 db_name = os.environ['DB_NAME']
 db_username = os.environ['DB_USERNAME']
 db_password = os.environ['DB_PASSWORD']
-
-def open_page(url):
-    open_script= """
-        <script type="text/javascript">
-            window.open('%s', '_self').focus();
-        </script>
-    """ % (url)
-    html(open_script)
 
 @st.cache_data
 def load_data(folder_path, address):
