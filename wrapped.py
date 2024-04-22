@@ -265,7 +265,7 @@ def main():
 
                 # Rationalize round names
                 all_df[['Round Name', 'Aggregate Name']] = all_df.apply(lambda row: update_for_cgrants_alpha(row, lookup_df) if row['Source'] in ['CGrants', 'Alpha'] else update_for_grantsstack(row, lookup_df), axis=1)
-                # Adding the 'GG' column to indentify if the contribution is for a Gitcoin Grant
+                # Adding the 'GG' column to identify if the contribution is for a Gitcoin Grant
                 all_df['GG'] = all_df['Aggregate Name'].apply(lambda x: 'N' if pd.isna(x) or x == '' else 'Y')
 
                 final_df = all_df[all_df['GG'] == 'Y']
@@ -375,15 +375,15 @@ def main():
                         top_5_rounds = top_5_rounds.drop(columns='GG')
                         top_5_rounds['AmountUSD'] = top_5_rounds['AmountUSD'].apply(lambda x: f"${x:,.2f}")
                         st.dataframe(top_5_rounds,hide_index=True, use_container_width=True)
-
-                        my_bar.progress(70,"🫡 thank you for your support to Gitcoin Grants. Check out your stats below while we build your personalized recommendations list for future rounds!")
+                        
+                        #my_bar.progress(70,"🫡 thank you for your support to Gitcoin Grants. Check out your stats below while we build your personalized recommendations list for future rounds!")
                         # Recommendations
-                        recommendations = get_recommendations(folder_path, address)
-                        st.markdown("#")
-                        st.success("### Curated Opportunities: Your Next Potential Grantees")
-                        st.caption("We pulled a list of recommended grantees for you based on contributors' choices who support the projects you support the most.")
-                        st.caption("The projects listed below have received the most support from donors over the last 12 months, who also contributed to the top three projects you have most supported.")
-                        st.dataframe(recommendations, hide_index=True, use_container_width=True)
+                        #recommendations = get_recommendations(folder_path, address)
+                        #st.markdown("#")
+                        #st.success("### Curated Opportunities: Your Next Potential Grantees")
+                        #st.caption("We pulled a list of recommended grantees for you based on contributors' choices who support the projects you support the most.")
+                        #st.caption("The projects listed below have received the most support from donors over the last 12 months, who also contributed to the top three projects you have most supported.")
+                        #st.dataframe(recommendations, hide_index=True, use_container_width=True)
 
                         my_bar.empty()
 
