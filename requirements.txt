@@ -4,4 +4,4 @@ plotly
 numpy
 datetime
 pytz
-psycopg2
+psycopg2-binary
