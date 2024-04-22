@@ -8,7 +8,14 @@ import re
 from datetime import datetime, timedelta
 import pytz
 import streamlit.components.v1 as components
-from streamlit.components.v1 import html
+from streamlit.components.v1 import HTML
+
+# Now you can use os.getenv to access your variables
+db_host= os.environ['DB_HOST']
+db_port = os.environ['DB_PORT']
+db_name = os.environ['DB_NAME']
+db_username = os.environ['DB_USERNAME']
+db_password = os.environ['DB_PASSWORD']
 
 def open_page(url):
     open_script= """
@@ -20,12 +27,28 @@ def open_page(url):
 
 @st.cache_data
 def load_data(folder_path, address):
-    all_dfs = []
-    for filename in os.listdir(folder_path):
-        if filename.endswith('.csv'):
-            df = pd.read_csv(os.path.join(folder_path, filename))
-            filtered_df = df[df['Voter'].str.lower() == address.lower()]
-            all_dfs.append(filtered_df)
+    query = """
+    SELECT d."round_num" AS "Round Num",
+           d."round_name" AS "Round Name",
+           d."voter" AS "Voter",
+           d."amountUSD" AS "AmountUSD",
+           d."payoutaddress" AS "PayoutAddress",
+           d."tx_timestamp" AS "Tx Timestamp",
+           d."project_name" AS "Project Name",
+           d."round_address" AS "Round Address",
+           d."source" AS "Source"
+    FROM all_donations d
+    WHERE lower(d."voter") = lower(%s)
+    LIMIT 1048575
+    """
+        
+    # Connect to the PostgreSQL database
+    conn = pg.connect(host=db_host, port=db_port, dbname=db_name, user=db_username, password=db_password)
+
+    all_dfs = pd.read_sql_query(query, conn, params=(address.lower(),))
+    
+    conn.close()
+
     return pd.concat(all_dfs, ignore_index=True) if all_dfs else pd.DataFrame()
 
 def create_cumulative_chart(final_df):
