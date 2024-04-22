@@ -209,35 +209,27 @@ def get_recommendations(folder_path, voter):
 
 # Main function to orchestrate the workflow
 def main():
+    # Set the columns for display
     st.set_page_config(layout='wide')
     tcol1,tcol2,tcol3 = st.columns([1,3,1])
-    
+
+    # Set image title and header
     tcol2.image("https://i.postimg.cc/wB32R5J1/Gbanner.png")
     tcol2.title('Gitcoin Grants Impact Dashboard')
     tcol2.markdown('### Your support for Gitcoin Grants has a story. Let\'s reveal it together.')
-        
+
+    # Load the configuration file (GS GG Rounds) that identifies what rounds to include in the statistics
     folder_path = './data'
     lookup_df = pd.read_csv('./GS GG Rounds.csv')
     lookup_df['Start Date'] = pd.to_datetime(lookup_df['Start Date']).dt.tz_localize(None)
     lookup_df['End Date'] = pd.to_datetime(lookup_df['End Date']).dt.tz_localize(None)
     lookup_df['ID'] = lookup_df['ID'].str.lower()
     
-    #query_params = st.query_params.get_all('address')
-
-    #if len(query_params) == 1:
-    #    address = query_params[0]
-    #    tcol2.text_input('Enter your Ethereum address below to uncover your unique impact story (starting "0x"):', 
-    #                               value = query_params[0],
-    #                               help='ENS not supported, please enter 42-character hexadecimal address starting with "0x"')    
-    #else:
-    #    address = tcol2.text_input('Enter your Ethereum address below to uncover your unique impact story (starting "0x"):', 
-    #                                     help='ENS not supported, please enter 42-character hexadecimal address starting with "0x"')
-
     # Initialize session state for address if not already set
     if 'address' not in st.session_state:
         st.session_state.address = None
     
-    # Check if address is provided in the URL
+    # Check if the address is provided in the URL
     query_params = st.query_params.get_all('address')
     if len(query_params) == 1 and not st.session_state.address:
         # Set the initial address from the URL in session state
@@ -254,9 +246,10 @@ def main():
     # Now, use the address from the session state for further processing
     address = st.session_state.address
 
-    #tcol2.button('Reset', on_click=open_page, args=('https://gg-your-impact.streamlit.app/',))
     if address and address != 'None':
         my_bar = tcol2.progress(0, text='Looking up! Please wait.')
+        
+        # Validate the syntax for the address
         if not re.match(r'^(0x)?[0-9a-f]{40}$', address, flags=re.IGNORECASE):
             tcol2.error('Not a valid address. Please enter a valid 42-character hexadecimal Ethereum address starting with "0x"')
             my_bar.empty()
