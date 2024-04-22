@@ -41,7 +41,7 @@ def load_data(folder_path, address):
     
     conn.close()
 
-    return pd.concat(all_dfs, ignore_index=True) if all_dfs else pd.DataFrame()
+    return all_dfs if not all_dfs.empty else pd.DataFrame()
 
 def create_cumulative_chart(final_df):
     final_df['Quarter'] = final_df['Tx Timestamp'].dt.to_period("Q")
