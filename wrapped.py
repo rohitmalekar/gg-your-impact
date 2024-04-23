@@ -19,7 +19,9 @@ db_password = st.secrets['DB_PASSWORD']
 
 @st.cache_data
 def load_data(folder_path, address):
-    query = """
+
+    # Gets GG1 through GG19 data
+    query_1 = """
     SELECT d."round_num" AS "Round Num",
            d."round_name" AS "Round Name",
            d."voter" AS "Voter",
@@ -33,11 +35,48 @@ def load_data(folder_path, address):
     WHERE lower(d."voter") = lower(%s)
     LIMIT 1048575
     """
-        
+
+    # Gets GG20 data
+    query_2 = """
+    SELECT
+        "chain_data_3287eeeb342085_62"."donations"."round_id" AS "Round Num",
+        ("chain_data_3287eeeb342085_62"."rounds"."round_metadata" #>> array [ 'name' ] :: text [ ]) :: text AS "Round Name",
+        "chain_data_3287eeeb342085_62"."donations"."donor_address" AS "Voter",
+        "chain_data_3287eeeb342085_62"."donations"."amount_in_usd" AS "AmountUSD",
+         "chain_data_3287eeeb342085_62"."donations"."recipient_address" AS "PayoutAddress",
+        '' as "Tx Timestamp",
+        ("chain_data_3287eeeb342085_62"."applications"."metadata"#>>array [ 'application','project','title' ]::text [])::text AS "Project Name",
+        "chain_data_3287eeeb342085_62"."rounds"."id" AS "Round Address",
+        'GrantsStack' AS "Source"
+    FROM
+        "chain_data_3287eeeb342085_62"."rounds",
+        "chain_data_3287eeeb342085_62"."applications",
+        "chain_data_3287eeeb342085_62"."donations"
+    where
+        -- filter for GG20 rounds
+        (
+            ("chain_data_3287eeeb342085_62"."rounds"."chain_id" = '42161' AND "chain_data_3287eeeb342085_62"."rounds"."id"  IN ('23','24','25','26','27','28','29','31'))
+        or
+            ("chain_data_3287eeeb342085_62"."rounds"."chain_id" = '10' AND "chain_data_3287eeeb342085_62"."rounds"."id"  IN ('9'))
+        )
+        AND
+        -- Join applications and rounds
+        "chain_data_3287eeeb342085_62"."applications"."round_id" = "chain_data_3287eeeb342085_62"."rounds"."id" AND 
+        "chain_data_3287eeeb342085_62"."applications"."chain_id" = "chain_data_3287eeeb342085_62"."rounds"."chain_id" AND
+        -- Join applications and donations
+        "chain_data_3287eeeb342085_62"."applications"."chain_id"  = "chain_data_3287eeeb342085_62"."donations"."chain_id" AND
+        "chain_data_3287eeeb342085_62"."applications"."round_id"  = "chain_data_3287eeeb342085_62"."donations"."round_id" AND 
+        "chain_data_3287eeeb342085_62"."applications"."id"  = "chain_data_3287eeeb342085_62"."donations"."application_id" AND
+        -- Filter on user's address
+        lower("chain_data_3287eeeb342085_62"."donations"."donor_address") = lower(%s)
+    """
+
     # Connect to the PostgreSQL database
     conn = pg.connect(host=db_host, port=db_port, dbname=db_name, user=db_username, password=db_password)
+    all_dfs_1 = pd.read_sql_query(query_1, conn, params=(address.lower(),))
+    all_dfs_2 = pd.read_sql_query(query_2, conn, params=(address.lower(),))
 
-    all_dfs = pd.read_sql_query(query, conn, params=(address.lower(),))
+    all_dfs = pd.concat([all_dfs_1, all_dfs_2], ignore_index=True)
     
     conn.close()
 
