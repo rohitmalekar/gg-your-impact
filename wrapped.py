@@ -331,7 +331,7 @@ def main():
 
                 # Due to missing Tx Timestamp on GG20, default to day 1 for cumulative dashboard reporting
                 default_date = pd.Timestamp('2024-04-23')
-                mask = (all_df['Tx Timestamp'].isna()) & (df['Aggregate Name'] == 'GG20')
+                mask = (all_df['Tx Timestamp'].isna()) & (all_df['Aggregate Name'] == 'GG20')
                 all_df.loc[mask, 'Tx Timestamp'] = default_date
 
                 final_df = all_df[all_df['GG'] == 'Y']
