@@ -50,7 +50,7 @@ def load_data(folder_path, address):
         "chain_data_3287eeeb342085_62"."donations"."donor_address" AS "Voter",
         "chain_data_3287eeeb342085_62"."donations"."amount_in_usd" AS "AmountUSD",
          "chain_data_3287eeeb342085_62"."donations"."recipient_address" AS "PayoutAddress",
-        '' as "Tx Timestamp",
+        'April 23, 2024, 18:00 PM' as "Tx Timestamp",
         ("chain_data_3287eeeb342085_62"."applications"."metadata"#>>array [ 'application','project','title' ]::text [])::text AS "Project Name",
         "chain_data_3287eeeb342085_62"."rounds"."id" AS "Round Address",
         'GrantsStack' AS "Source"
