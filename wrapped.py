@@ -14,9 +14,14 @@ import psycopg2 as pg
 db_host= st.secrets['DB_HOST']
 db_port = st.secrets['DB_PORT']
 db_name = st.secrets['DB_NAME']
-db_name_i = st.secrets['DB_NAME_I']
 db_username = st.secrets['DB_USERNAME']
 db_password = st.secrets['DB_PASSWORD']
+
+indexer_db_host= st.secrets['INDEXER_DB_HOST']
+indexer_db_port = st.secrets['INDEXER_DB_PORT']
+indexer_db_name = st.secrets['INDEXER_DB_NAME']
+indexer_db_username = st.secrets['INDEXER_DB_USERNAME']
+indexer_db_password = st.secrets['INDEXER_DB_PASSWORD']
 
 @st.cache_data
 def load_data(folder_path, address):
@@ -74,9 +79,9 @@ def load_data(folder_path, address):
 
     # Connect to the PostgreSQL database
     conn = pg.connect(host=db_host, port=db_port, dbname=db_name, user=db_username, password=db_password)
-    conn_i = pg.connect(host=db_host, port=db_port, dbname=db_name_i, user=db_username, password=db_password)
+    indexer_conn = pg.connect(host=indexer_db_host, port=indexer_db_port, dbname=indexer_db_name, user=indexer_db_username, password=indexer_db_password)
     all_dfs_1 = pd.read_sql_query(query_1, conn, params=(address.lower(),))
-    all_dfs_2 = pd.read_sql_query(query_2, conn_i, params=(address.lower(),))
+    all_dfs_2 = pd.read_sql_query(query_2, indexer_conn, params=(address.lower(),))
 
     all_dfs = pd.concat([all_dfs_1, all_dfs_2], ignore_index=True)
     
