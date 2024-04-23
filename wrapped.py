@@ -55,9 +55,9 @@ def load_data(folder_path, address):
         "chain_data_3287eeeb342085_62"."Rounds"."id" AS "Round Address",
         'GrantsStack' AS "Source"
     FROM
-        "chain_data_3287eeeb342085_62"."Rounds",
-        "chain_data_3287eeeb342085_62"."Applications",
-        "chain_data_3287eeeb342085_62"."Donations"
+        "chain_data_3287eeeb342085_62"."rounds",
+        "chain_data_3287eeeb342085_62"."applications",
+        "chain_data_3287eeeb342085_62"."donations"
     where
         -- filter for GG20 rounds
         (
