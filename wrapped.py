@@ -50,7 +50,7 @@ def load_data(folder_path, address):
         "chain_data_3287eeeb342085_62"."donations"."donor_address" AS "Voter",
         "chain_data_3287eeeb342085_62"."donations"."amount_in_usd" AS "AmountUSD",
          "chain_data_3287eeeb342085_62"."donations"."recipient_address" AS "PayoutAddress",
-        'April 23, 2024, 18:00 PM' as "Tx Timestamp",
+        '' as "Tx Timestamp",
         ("chain_data_3287eeeb342085_62"."applications"."metadata"#>>array [ 'application','project','title' ]::text [])::text AS "Project Name",
         "chain_data_3287eeeb342085_62"."rounds"."id" AS "Round Address",
         'GrantsStack' AS "Source"
@@ -328,6 +328,11 @@ def main():
                 all_df[['Round Name', 'Aggregate Name']] = all_df.apply(lambda row: update_for_cgrants_alpha(row, lookup_df) if row['Source'] in ['CGrants', 'Alpha'] else update_for_grantsstack(row, lookup_df), axis=1)
                 # Adding the 'GG' column to identify if the contribution is for a Gitcoin Grant
                 all_df['GG'] = all_df['Aggregate Name'].apply(lambda x: 'N' if pd.isna(x) or x == '' else 'Y')
+
+                # Due to missing Tx Timestamp on GG20, default to day 1 for cumulative dashboard reporting
+                default_date = pd.Timestamp('2024-04-23')
+                mask = (all_df['Tx Timestamp'].isna()) & (df['Aggregate Name'] == 'GG20')
+                all_df.loc[mask, 'Tx Timestamp'] = default_date
 
                 final_df = all_df[all_df['GG'] == 'Y']
                 not_ggrant_df = all_df[all_df['GG'] == 'N']
