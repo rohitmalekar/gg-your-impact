@@ -14,6 +14,7 @@ import psycopg2 as pg
 db_host= st.secrets['DB_HOST']
 db_port = st.secrets['DB_PORT']
 db_name = st.secrets['DB_NAME']
+db_name_i = st.secrets['DB_NAME_I']
 db_username = st.secrets['DB_USERNAME']
 db_password = st.secrets['DB_PASSWORD']
 
@@ -73,8 +74,9 @@ def load_data(folder_path, address):
 
     # Connect to the PostgreSQL database
     conn = pg.connect(host=db_host, port=db_port, dbname=db_name, user=db_username, password=db_password)
+    conn_i = pg.connect(host=db_host, port=db_port, dbname=db_name_i, user=db_username, password=db_password)
     all_dfs_1 = pd.read_sql_query(query_1, conn, params=(address.lower(),))
-    all_dfs_2 = pd.read_sql_query(query_2, conn, params=(address.lower(),))
+    all_dfs_2 = pd.read_sql_query(query_2, conn_i, params=(address.lower(),))
 
     all_dfs = pd.concat([all_dfs_1, all_dfs_2], ignore_index=True)
     
