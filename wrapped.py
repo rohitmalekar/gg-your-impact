@@ -45,14 +45,14 @@ def load_data(folder_path, address):
     # Gets GG20 data
     query_2 = """
     SELECT
-        "chain_data_3287eeeb342085_62"."Donations"."round_id" AS "Round Num",
-        ("chain_data_3287eeeb342085_62"."Rounds"."round_metadata" #>> array [ 'name' ] :: text [ ]) :: text AS "Round Name",
-        "chain_data_3287eeeb342085_62"."Donations"."donor_address" AS "Voter",
-        "chain_data_3287eeeb342085_62"."Donations"."amount_in_usd" AS "AmountUSD",
-         "chain_data_3287eeeb342085_62"."Donations"."recipient_address" AS "PayoutAddress",
+        "chain_data_3287eeeb342085_62"."donations"."round_id" AS "Round Num",
+        ("chain_data_3287eeeb342085_62"."rounds"."round_metadata" #>> array [ 'name' ] :: text [ ]) :: text AS "Round Name",
+        "chain_data_3287eeeb342085_62"."donations"."donor_address" AS "Voter",
+        "chain_data_3287eeeb342085_62"."donations"."amount_in_usd" AS "AmountUSD",
+         "chain_data_3287eeeb342085_62"."donations"."recipient_address" AS "PayoutAddress",
         '' as "Tx Timestamp",
         ("chain_data_3287eeeb342085_62"."applications"."metadata"#>>array [ 'application','project','title' ]::text [])::text AS "Project Name",
-        "chain_data_3287eeeb342085_62"."Rounds"."id" AS "Round Address",
+        "chain_data_3287eeeb342085_62"."rounds"."id" AS "Round Address",
         'GrantsStack' AS "Source"
     FROM
         "chain_data_3287eeeb342085_62"."rounds",
@@ -61,20 +61,20 @@ def load_data(folder_path, address):
     where
         -- filter for GG20 rounds
         (
-            ("chain_data_3287eeeb342085_62"."Rounds"."chain_id" = '42161' AND "chain_data_3287eeeb342085_62"."Rounds"."id"  IN ('23','24','25','26','27','28','29','31'))
+            ("chain_data_3287eeeb342085_62"."rounds"."chain_id" = '42161' AND "chain_data_3287eeeb342085_62"."rounds"."id"  IN ('23','24','25','26','27','28','29','31'))
         or
-            ("chain_data_3287eeeb342085_62"."Rounds"."chain_id" = '10' AND "chain_data_3287eeeb342085_62"."Rounds"."id"  IN ('9'))
+            ("chain_data_3287eeeb342085_62"."rounds"."chain_id" = '10' AND "chain_data_3287eeeb342085_62"."rounds"."id"  IN ('9'))
         )
         AND
         -- Join applications and rounds
-        "chain_data_3287eeeb342085_62"."Applications"."round_id" = "chain_data_3287eeeb342085_62"."Rounds"."id" AND 
-        "chain_data_3287eeeb342085_62"."Applications"."chain_id" = "chain_data_3287eeeb342085_62"."Rounds"."chain_id" AND
+        "chain_data_3287eeeb342085_62"."applications"."round_id" = "chain_data_3287eeeb342085_62"."rounds"."id" AND 
+        "chain_data_3287eeeb342085_62"."applications"."chain_id" = "chain_data_3287eeeb342085_62"."rounds"."chain_id" AND
         -- Join applications and donations
-        "chain_data_3287eeeb342085_62"."Applications"."chain_id"  = "chain_data_3287eeeb342085_62"."Donations"."chain_id" AND
-        "chain_data_3287eeeb342085_62"."Applications"."round_id"  = "chain_data_3287eeeb342085_62"."Donations"."round_id" AND 
-        "chain_data_3287eeeb342085_62"."Applications"."id"  = "chain_data_3287eeeb342085_62"."Donations"."application_id" AND
+        "chain_data_3287eeeb342085_62"."applications"."chain_id"  = "chain_data_3287eeeb342085_62"."donations"."chain_id" AND
+        "chain_data_3287eeeb342085_62"."applications"."round_id"  = "chain_data_3287eeeb342085_62"."donations"."round_id" AND 
+        "chain_data_3287eeeb342085_62"."applications"."id"  = "chain_data_3287eeeb342085_62"."donations"."application_id" AND
         -- Filter on user's address
-        lower("chain_data_3287eeeb342085_62"."Donations"."donor_address") = lower(%s)
+        lower("chain_data_3287eeeb342085_62"."donations"."donor_address") = lower(%s)
     """
 
     # Connect to the PostgreSQL database
