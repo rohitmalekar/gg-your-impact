@@ -134,10 +134,10 @@ def create_heatmap(final_df):
     return fig
 
 def display_donation_history(final_df):
-    desired_columns = ['Project Name', 'AmountUSD', 'Tx Timestamp', 'Round Name']
+    desired_columns = ['Project Name', 'AmountUSD', 'Round Name']
     display_df = final_df[desired_columns].copy()
     display_df['AmountUSD'] = display_df['AmountUSD'].apply(lambda x: f"${x:,.2f}")
-    display_df = display_df.sort_values('Tx Timestamp', ascending=False)
+    #display_df = display_df.sort_values('Tx Timestamp', ascending=False)
     return display_df
 
 def display_top_projects_treemap(final_df):
