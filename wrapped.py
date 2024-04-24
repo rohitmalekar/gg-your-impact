@@ -520,21 +520,21 @@ def main():
                         top_donations = filtered_df.groupby('PayoutAddress').agg({'AmountUSD': 'sum'}).reset_index()
                         
                         top_recos = get_recommendations_gg20(top_donations, address)
-                        
-                        
+
                         # Filter the DataFrame to include only the necessary columns
                         display_df = top_recos[['Project Name', 'Round Name', 'Donated', 'link']]
                         
-                        # Modify the 'Donated' column to display a checkmark or URL
-                        display_df['Donated in GG20'] = display_df.apply(
-                            lambda row: '✅' if row['Donated'] == 'Yes' else "", axis=1
+                        # Prefix 'Project Name' with a checkmark if 'Donated' is 'Yes'
+                        display_df['Project Name'] = display_df.apply(
+                            lambda row: '✅ ' + row['Project Name'] if row['Donated'] == 'Yes' else row['Project Name'],
+                            axis=1
                         )
                         
                         st.dataframe(
                             display_df,
                             hide_index=True, 
                             use_container_width=True,
-                            column_order=("Project Name","Round Name", "link", "Donated in GG20"),
+                            column_order=("Project Name","Round Name", "link"),
                             column_config={
                                 "link": st.column_config.LinkColumn("Explorer Link", display_text="View Project")    
                             }
