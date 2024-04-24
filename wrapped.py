@@ -317,7 +317,7 @@ def get_recommendations_gg20(df,address):
     merged_df = pd.merge(gg20_df, df[['PayoutAddress', 'AmountUSD']], on='PayoutAddress', how='inner')
     
     # Sort the merged DataFrame based on the AmountUSD column
-    sorted_merged_df = merged_df.sort_values(by='AmountUSD', ascending=True)
+    sorted_merged_df = merged_df.sort_values(by='AmountUSD', ascending=False)
     
     return sorted_merged_df
 
@@ -507,8 +507,24 @@ def main():
                         # Show favorite projects partcipating in GG20
                         top_donations = final_df.groupby('PayoutAddress').agg({'AmountUSD': 'sum'}).reset_index()
                         top_recos = get_recommendations_gg20(top_donations, address)
-                        st.dataframe(top_recos,hide_index=True, use_container_width=True)
+
+                        # Filter the DataFrame to include only the necessary columns
+                        display_df = top_recos[['Project Name', 'Round Name', 'Donated', 'Link']]
                         
+                        # Modify the 'Donated' column to display a checkmark or URL
+                        display_df['Display'] = display_df.apply(
+                            lambda row: '✅' if row['Donated'] == 'Yes' else f"[URL]({row['Link']})", axis=1
+                        )
+                        
+                        # Drop the original 'Donated' and 'Link' columns as they are now redundant or transformed
+                        display_df = display_df.drop(columns=['Donated', 'Link'])
+                        
+                        # Rename 'Display' to 'Donated' to keep original column name for clarity
+                        display_df = display_df.rename(columns={'Display': 'Donated'})
+                        
+                        # Display the DataFrame in Streamlit without the index
+                        st.dataframe(display_df, hide_index=True, use_container_width=True)
+                                            
 
                         my_bar.empty()
 
