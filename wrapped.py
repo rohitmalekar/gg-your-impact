@@ -514,7 +514,7 @@ def main():
                         
                         # Modify the 'Donated' column to display a checkmark or URL
                         display_df['Display'] = display_df.apply(
-                            lambda row: '✅' if row['Donated'] == 'Yes' else f"[URL]({row['link']})", axis=1
+                            lambda row: '✅' if row['Donated'] == 'Yes' else f"[View Project]({row['link']})", axis=1
                         )
                         
                         # Drop the original 'Donated' and 'Link' columns as they are now redundant or transformed
@@ -524,7 +524,7 @@ def main():
                         display_df = display_df.rename(columns={'Display': 'Donated'})
                         
                         # Display the DataFrame in Streamlit without the index
-                        st.dataframe(display_df, hide_index=True, use_container_width=True)
+                        st.dataframe(display_df, hide_index=True, use_container_width=True, unsafe_allow_html=True)
                                             
 
                         my_bar.empty()
