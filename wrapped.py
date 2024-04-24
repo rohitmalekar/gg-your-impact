@@ -310,7 +310,7 @@ def get_recommendations_gg20(df,address):
     indexer_conn = pg.connect(host=indexer_db_host, port=indexer_db_port, dbname=indexer_db_name, user=indexer_db_username, password=indexer_db_password)
     gg20_df = pd.read_sql_query(query, indexer_conn, params=(address.lower(),))
 
-    mask = gg20_df['payoutaddress'].isin(df['payoutaddress'])
+    mask = gg20_df['PayoutAddress'].isin(df['PayoutAddress'])
     filtered_gg20_df = gg20_df[mask]
 
     return filtered_gg20_df
