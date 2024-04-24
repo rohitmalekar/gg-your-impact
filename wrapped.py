@@ -509,7 +509,8 @@ def main():
                         st.success("### Rediscover Your Favorites in GG20")
                         st.caption("Below is a list of projects you've previously supported and are participating in GG20. \
                             Consider showing your support again! For projects you've recently backed in GG20, you'll see a ✅. \
-                            Please note: There may be a one-day delay in reflecting your latest contributions.")
+                            Please note: There may be a one-day delay in reflecting your latest contributions.\
+                            If a project you have previously supported has a new payout address, it may not appear in this list.")
 
                         # Exclude donations in GG20 before finding most supported projects
                         filtered_df = final_df[final_df['Aggregate Name'] != 'GG20']
