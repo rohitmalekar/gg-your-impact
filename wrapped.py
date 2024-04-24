@@ -516,7 +516,6 @@ def main():
                         filtered_df = final_df[final_df['Aggregate Name'] != 'GG20']
 
                         top_donations = filtered_df.groupby('PayoutAddress').agg({'AmountUSD': 'sum'}).reset_index()
-                        st.dataframe(top_donations, hide_index=True, use_container_width=True)
                         
                         top_recos = get_recommendations_gg20(top_donations, address)
                         
