@@ -523,8 +523,9 @@ def main():
                         # Rename 'Display' to 'Donated' to keep original column name for clarity
                         display_df = display_df.rename(columns={'Display': 'Donated'})
                         
-                        # Display the DataFrame in Streamlit without the index
-                        st.dataframe(display_df, hide_index=True, use_container_width=True, unsafe_allow_html=True)
+                        # Convert the DataFrame to HTML for displaying as a Markdown with hyperlinks
+                        html = display_df.to_html(escape=False, index=False)
+                        st.markdown(html, unsafe_allow_html=True)
                                             
 
                         my_bar.empty()
