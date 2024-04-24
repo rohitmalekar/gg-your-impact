@@ -527,7 +527,7 @@ def main():
                             display_df,
                             hide_index=True, 
                             use_container_width=True,
-                            st.column_config= {
+                            column_config={
                                 "Donated": st.column_config.LinkColumn("View Project")    
                             }
                         )                    
