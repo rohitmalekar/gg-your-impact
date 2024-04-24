@@ -266,7 +266,54 @@ def get_recommendations(folder_path, voter):
 
     return recommended_projects[['Project Name']]
 
+def get_recommendations_gg20(df,address):
     
+    # Find participating project in GG20
+    query = """
+        SELECT      
+            CONCAT('https://explorer.gitcoin.co/#/round/',"chain_data_3287eeeb342085_62"."rounds"."chain_id",'/',"chain_data_3287eeeb342085_62"."rounds"."id",'/',"chain_data_3287eeeb342085_62"."applications"."id") as Link,
+            ("chain_data_3287eeeb342085_62"."applications"."metadata"#>>array [ 'application','project','title' ]::text [])::text AS "Project Name",
+            ("chain_data_3287eeeb342085_62"."rounds"."round_metadata" #>> array [ 'name' ] :: text [ ]) :: text AS "Round Name",
+            "chain_data_3287eeeb342085_62"."rounds"."chain_id" as "Chain ID",
+            "chain_data_3287eeeb342085_62"."rounds"."id" as "Round ID",
+            "chain_data_3287eeeb342085_62"."applications"."id" as "Application ID",
+            lower(("chain_data_3287eeeb342085_62"."applications"."metadata"#>>array [ 'application','recipient' ]::text [])::text) AS "PayoutAddress",
+            CASE 
+                WHEN "chain_data_3287eeeb342085_62"."donations"."donor_address" IS NOT NULL
+                THEN 'Yes'
+            ELSE 'No'
+            END AS "Donated"
+        FROM
+            "chain_data_3287eeeb342085_62"."rounds" 
+            JOIN
+            "chain_data_3287eeeb342085_62"."applications" 
+        ON
+            "chain_data_3287eeeb342085_62"."applications"."round_id" = "chain_data_3287eeeb342085_62"."rounds"."id" AND 
+            "chain_data_3287eeeb342085_62"."applications"."chain_id" = "chain_data_3287eeeb342085_62"."rounds"."chain_id" AND
+            "chain_data_3287eeeb342085_62"."applications"."status" = 'APPROVED'
+        LEFT OUTER JOIN
+            "chain_data_3287eeeb342085_62"."donations"
+        ON
+            "chain_data_3287eeeb342085_62"."applications"."chain_id"  = "chain_data_3287eeeb342085_62"."donations"."chain_id" AND
+            "chain_data_3287eeeb342085_62"."applications"."round_id"  = "chain_data_3287eeeb342085_62"."donations"."round_id" AND 
+            "chain_data_3287eeeb342085_62"."applications"."id"  = "chain_data_3287eeeb342085_62"."donations"."application_id" AND
+            lower("chain_data_3287eeeb342085_62"."donations"."donor_address") = lower(%s)
+        WHERE    
+            -- filter for GG20 rounds
+            (
+                ("chain_data_3287eeeb342085_62"."rounds"."chain_id" = '42161' AND "chain_data_3287eeeb342085_62"."rounds"."id"  IN ('23','24','25','26','27','28','29','31'))
+            or
+                ("chain_data_3287eeeb342085_62"."rounds"."chain_id" = '10' AND "chain_data_3287eeeb342085_62"."rounds"."id"  IN ('9'))
+            )
+      """      
+
+    indexer_conn = pg.connect(host=indexer_db_host, port=indexer_db_port, dbname=indexer_db_name, user=indexer_db_username, password=indexer_db_password)
+    gg20_df = pd.read_sql_query(query, indexer_conn, params=(address.lower(),))
+
+    mask = gg20_df['payoutaddress'].isin(df['payoutaddress'])
+    filtered_gg20_df = gg20_df[mask]
+
+    return filtered_gg20_df
 
 # Main function to orchestrate the workflow
 def main():
@@ -450,6 +497,12 @@ def main():
                         #st.caption("We pulled a list of recommended grantees for you based on contributors' choices who support the projects you support the most.")
                         #st.caption("The projects listed below have received the most support from donors over the last 12 months, who also contributed to the top three projects you have most supported.")
                         #st.dataframe(recommendations, hide_index=True, use_container_width=True)
+
+                        # Show favorite projects partcipating in GG20
+                        top_donations = final_df.groupby('PayoutAddress').agg({'AmountUSD': 'sum'}).reset_index()
+                        top_recos = get_recommendations_gg20(top_donations, address)
+                        st.dataframe(top_recos,hide_index=True, use_container_width=True)
+                        
 
                         my_bar.empty()
 
