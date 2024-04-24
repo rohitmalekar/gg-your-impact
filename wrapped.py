@@ -504,8 +504,17 @@ def main():
                         #st.caption("The projects listed below have received the most support from donors over the last 12 months, who also contributed to the top three projects you have most supported.")
                         #st.dataframe(recommendations, hide_index=True, use_container_width=True)
 
-                        # Show favorite projects partcipating in GG20
-                        top_donations = final_df.groupby('PayoutAddress').agg({'AmountUSD': 'sum'}).reset_index()
+                        # Show favorite projects participating in GG20
+                        st.markdown("#")
+                        st.success("### Rediscover Your Favorites in GG20")
+                        st.caption("Below is a list of projects you've previously supported and are participating in GG20. \
+                            Consider showing your support again! For projects you've recently backed in GG20, you'll see a ✅. \
+                            Please note: There may be a one-day delay in reflecting your latest contributions.")
+
+                        # Exclude donations in GG20 before finding most supported projects
+                        filtered_df = final_df[final_df['Aggregate Name'] != 'GG20']
+
+                        top_donations = filtered_df.groupby('PayoutAddress').agg({'AmountUSD': 'sum'}).reset_index()
                         top_recos = get_recommendations_gg20(top_donations, address)
                         #st.dataframe(top_recos, hide_index=True, use_container_width=True)
                         
@@ -521,7 +530,7 @@ def main():
                             display_df,
                             hide_index=True, 
                             use_container_width=True,
-                            column_order=("Project Name","Round Name", "link", "Donated in GG20")
+                            column_order=("Project Name","Round Name", "link", "Donated in GG20"),
                             column_config={
                                 "link": st.column_config.LinkColumn("Explorer Link", display_text="View Project")    
                             }
