@@ -521,8 +521,9 @@ def main():
                             display_df,
                             hide_index=True, 
                             use_container_width=True,
+                            column_order=("Project Name","Round Name", "link", "Donated in GG20")
                             column_config={
-                                "link": st.column_config.LinkColumn("View Project")    
+                                "link": st.column_config.LinkColumn("Explorer Link", display_text="View Project")    
                             }
                         )                    
 
