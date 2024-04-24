@@ -507,18 +507,18 @@ def main():
                         # Show favorite projects partcipating in GG20
                         top_donations = final_df.groupby('PayoutAddress').agg({'AmountUSD': 'sum'}).reset_index()
                         top_recos = get_recommendations_gg20(top_donations, address)
-                        st.dataframe(top_recos, hide_index=True, use_container_width=True)
+                        #st.dataframe(top_recos, hide_index=True, use_container_width=True)
                         
                         # Filter the DataFrame to include only the necessary columns
-                        display_df = top_recos[['Project Name', 'Round Name', 'Donated', 'Link']]
+                        display_df = top_recos[['Project Name', 'Round Name', 'Donated', 'link']]
                         
                         # Modify the 'Donated' column to display a checkmark or URL
                         display_df['Display'] = display_df.apply(
-                            lambda row: '✅' if row['Donated'] == 'Yes' else f"[URL]({row['Link']})", axis=1
+                            lambda row: '✅' if row['Donated'] == 'Yes' else f"[URL]({row['link']})", axis=1
                         )
                         
                         # Drop the original 'Donated' and 'Link' columns as they are now redundant or transformed
-                        display_df = display_df.drop(columns=['Donated', 'Link'])
+                        display_df = display_df.drop(columns=['Donated', 'link'])
                         
                         # Rename 'Display' to 'Donated' to keep original column name for clarity
                         display_df = display_df.rename(columns={'Display': 'Donated'})
