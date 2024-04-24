@@ -513,22 +513,16 @@ def main():
                         display_df = top_recos[['Project Name', 'Round Name', 'Donated', 'link']]
                         
                         # Modify the 'Donated' column to display a checkmark or URL
-                        display_df['Display'] = display_df.apply(
-                            lambda row: '✅' if row['Donated'] == 'Yes' else f"[View Project]({row['link']})", axis=1
+                        display_df['Donated in GG20'] = display_df.apply(
+                            lambda row: '✅' if row['Donated'] == 'Yes' else "", axis=1
                         )
-                        
-                        # Drop the original 'Donated' and 'Link' columns as they are now redundant or transformed
-                        display_df = display_df.drop(columns=['Donated', 'link'])
-                        
-                        # Rename 'Display' to 'Donated' to keep original column name for clarity
-                        display_df = display_df.rename(columns={'Display': 'Donated'})
                         
                         st.dataframe(
                             display_df,
                             hide_index=True, 
                             use_container_width=True,
                             column_config={
-                                "Donated": st.column_config.LinkColumn("View Project")    
+                                "link": st.column_config.LinkColumn("View Project")    
                             }
                         )                    
 
