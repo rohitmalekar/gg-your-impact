@@ -4,3 +4,8 @@ primaryColor="#00433b"
 secondaryBackgroundColor="#b2dad5"
 textColor="#1a202c"
 font="monospace"
+
+[server]
+enableCORS=false
+address = "0.0.0.0"
+port = 8501
