@@ -8,24 +8,86 @@ import re
 from datetime import datetime, timedelta
 import pytz
 import streamlit.components.v1 as components
-from streamlit.components.v1 import html
+import psycopg2 as pg
 
-def open_page(url):
-    open_script= """
-        <script type="text/javascript">
-            window.open('%s', '_self').focus();
-        </script>
-    """ % (url)
-    html(open_script)
+# Now you can use os.getenv to access your variables
+db_host= st.secrets['DB_HOST']
+db_port = st.secrets['DB_PORT']
+db_name = st.secrets['DB_NAME']
+db_username = st.secrets['DB_USERNAME']
+db_password = st.secrets['DB_PASSWORD']
+
+indexer_db_host= st.secrets['INDEXER_DB_HOST']
+indexer_db_port = st.secrets['INDEXER_DB_PORT']
+indexer_db_name = st.secrets['INDEXER_DB_NAME']
+indexer_db_username = st.secrets['INDEXER_DB_USERNAME']
+indexer_db_password = st.secrets['INDEXER_DB_PASSWORD']
 
 @st.cache_data
 def load_data(folder_path, address):
-    all_dfs = []
-    for filename in os.listdir(folder_path):
-        if filename.endswith('.csv'):
-            df = pd.read_csv(os.path.join(folder_path, filename))
-            filtered_df = df[df['Voter'].str.lower() == address.lower()]
-            all_dfs.append(filtered_df)
+
+
+    # Gets GG1 through GG19 data
+    query_1 = """
+    SELECT d."round_num" AS "Round Num",
+           d."round_name" AS "Round Name",
+           d."voter" AS "Voter",
+           d."amountUSD" AS "AmountUSD",
+           d."payoutaddress" AS "PayoutAddress",
+           d."tx_timestamp" AS "Tx Timestamp",
+           d."project_name" AS "Project Name",
+           d."round_address" AS "Round Address",
+           d."source" AS "Source"
+    FROM all_donations d
+    WHERE lower(d."voter") = lower(%s)
+    LIMIT 1048575
+    """
+
+    # Gets GG20 data
+    query_2 = """
+    SELECT
+        "chain_data_3287eeeb342085_62"."donations"."round_id" AS "Round Num",
+        ("chain_data_3287eeeb342085_62"."rounds"."round_metadata" #>> array [ 'name' ] :: text [ ]) :: text AS "Round Name",
+        "chain_data_3287eeeb342085_62"."donations"."donor_address" AS "Voter",
+        "chain_data_3287eeeb342085_62"."donations"."amount_in_usd" AS "AmountUSD",
+         "chain_data_3287eeeb342085_62"."donations"."recipient_address" AS "PayoutAddress",
+        '' as "Tx Timestamp",
+        ("chain_data_3287eeeb342085_62"."applications"."metadata"#>>array [ 'application','project','title' ]::text [])::text AS "Project Name",
+        "chain_data_3287eeeb342085_62"."rounds"."id" AS "Round Address",
+        'GrantsStack' AS "Source"
+    FROM
+        "chain_data_3287eeeb342085_62"."rounds",
+        "chain_data_3287eeeb342085_62"."applications",
+        "chain_data_3287eeeb342085_62"."donations"
+    where
+        -- filter for GG20 rounds
+        (
+            ("chain_data_3287eeeb342085_62"."rounds"."chain_id" = '42161' AND "chain_data_3287eeeb342085_62"."rounds"."id"  IN ('23','24','25','26','27','28','29','31'))
+        or
+            ("chain_data_3287eeeb342085_62"."rounds"."chain_id" = '10' AND "chain_data_3287eeeb342085_62"."rounds"."id"  IN ('9'))
+        )
+        AND
+        -- Join applications and rounds
+        "chain_data_3287eeeb342085_62"."applications"."round_id" = "chain_data_3287eeeb342085_62"."rounds"."id" AND 
+        "chain_data_3287eeeb342085_62"."applications"."chain_id" = "chain_data_3287eeeb342085_62"."rounds"."chain_id" AND
+        -- Join applications and donations
+        "chain_data_3287eeeb342085_62"."applications"."chain_id"  = "chain_data_3287eeeb342085_62"."donations"."chain_id" AND
+        "chain_data_3287eeeb342085_62"."applications"."round_id"  = "chain_data_3287eeeb342085_62"."donations"."round_id" AND 
+        "chain_data_3287eeeb342085_62"."applications"."id"  = "chain_data_3287eeeb342085_62"."donations"."application_id" AND
+        -- Filter on user's address
+        lower("chain_data_3287eeeb342085_62"."donations"."donor_address") = lower(%s)
+    """
+
+    # Connect to the PostgreSQL database
+    conn = pg.connect(host=db_host, port=db_port, dbname=db_name, user=db_username, password=db_password)
+    indexer_conn = pg.connect(host=indexer_db_host, port=indexer_db_port, dbname=indexer_db_name, user=indexer_db_username, password=indexer_db_password)
+    all_dfs_1 = pd.read_sql_query(query_1, conn, params=(address.lower(),))
+    all_dfs_2 = pd.read_sql_query(query_2, indexer_conn, params=(address.lower(),))
+
+    all_dfs = pd.concat([all_dfs_1, all_dfs_2], ignore_index=True)
+    
+    conn.close()
+
     return all_dfs if not all_dfs.empty else pd.DataFrame()
 
 def create_cumulative_chart(final_df):
@@ -76,7 +138,7 @@ def display_donation_history(final_df):
     desired_columns = ['Project Name', 'AmountUSD', 'Tx Timestamp', 'Round Name']
     display_df = final_df[desired_columns].copy()
     display_df['AmountUSD'] = display_df['AmountUSD'].apply(lambda x: f"${x:,.2f}")
-    display_df = display_df.sort_values('Tx Timestamp', ascending=False)
+    display_df = display_df.sort_values('Tx Timestamp', ascending=False, na_position='first')
     return display_df
 
 def display_top_projects_treemap(final_df):
@@ -205,39 +267,84 @@ def get_recommendations(folder_path, voter):
 
     return recommended_projects[['Project Name']]
 
+def get_recommendations_gg20(df,address):
     
+    # Find participating project in GG20
+    query = """
+        SELECT      
+            CONCAT('https://explorer.gitcoin.co/#/round/',"chain_data_3287eeeb342085_62"."rounds"."chain_id",'/',"chain_data_3287eeeb342085_62"."rounds"."id",'/',"chain_data_3287eeeb342085_62"."applications"."id") as Link,
+            ("chain_data_3287eeeb342085_62"."applications"."metadata"#>>array [ 'application','project','title' ]::text [])::text AS "Project Name",
+            ("chain_data_3287eeeb342085_62"."rounds"."round_metadata" #>> array [ 'name' ] :: text [ ]) :: text AS "Round Name",
+            "chain_data_3287eeeb342085_62"."rounds"."chain_id" as "Chain ID",
+            "chain_data_3287eeeb342085_62"."rounds"."id" as "Round ID",
+            "chain_data_3287eeeb342085_62"."applications"."id" as "Application ID",
+            lower(("chain_data_3287eeeb342085_62"."applications"."metadata"#>>array [ 'application','recipient' ]::text [])::text) AS "PayoutAddress",
+            CASE 
+                WHEN "chain_data_3287eeeb342085_62"."donations"."donor_address" IS NOT NULL
+                THEN 'Yes'
+            ELSE 'No'
+            END AS "Donated"
+        FROM
+            "chain_data_3287eeeb342085_62"."rounds" 
+            JOIN
+            "chain_data_3287eeeb342085_62"."applications" 
+        ON
+            "chain_data_3287eeeb342085_62"."applications"."round_id" = "chain_data_3287eeeb342085_62"."rounds"."id" AND 
+            "chain_data_3287eeeb342085_62"."applications"."chain_id" = "chain_data_3287eeeb342085_62"."rounds"."chain_id" AND
+            "chain_data_3287eeeb342085_62"."applications"."status" = 'APPROVED'
+        LEFT OUTER JOIN
+            "chain_data_3287eeeb342085_62"."donations"
+        ON
+            "chain_data_3287eeeb342085_62"."applications"."chain_id"  = "chain_data_3287eeeb342085_62"."donations"."chain_id" AND
+            "chain_data_3287eeeb342085_62"."applications"."round_id"  = "chain_data_3287eeeb342085_62"."donations"."round_id" AND 
+            "chain_data_3287eeeb342085_62"."applications"."id"  = "chain_data_3287eeeb342085_62"."donations"."application_id" AND
+            lower("chain_data_3287eeeb342085_62"."donations"."donor_address") = lower(%s)
+        WHERE    
+            -- filter for GG20 rounds
+            (
+                ("chain_data_3287eeeb342085_62"."rounds"."chain_id" = '42161' AND "chain_data_3287eeeb342085_62"."rounds"."id"  IN ('23','24','25','26','27','28','29','31'))
+            or
+                ("chain_data_3287eeeb342085_62"."rounds"."chain_id" = '10' AND "chain_data_3287eeeb342085_62"."rounds"."id"  IN ('9'))
+            )
+      """      
+
+    indexer_conn = pg.connect(host=indexer_db_host, port=indexer_db_port, dbname=indexer_db_name, user=indexer_db_username, password=indexer_db_password)
+    gg20_df = pd.read_sql_query(query, indexer_conn, params=(address.lower(),))
+
+    #mask = gg20_df['PayoutAddress'].isin(df['PayoutAddress'])
+    #filtered_gg20_df = gg20_df[mask]
+
+    # Merge gg20 data with user's donation history
+    merged_df = pd.merge(gg20_df, df[['PayoutAddress', 'AmountUSD']], on='PayoutAddress', how='inner')
+    
+    # Sort the merged DataFrame based on the AmountUSD column
+    sorted_merged_df = merged_df.sort_values(by='AmountUSD', ascending=False)
+    
+    return sorted_merged_df
 
 # Main function to orchestrate the workflow
 def main():
+    # Set the columns for display
     st.set_page_config(layout='wide')
     tcol1,tcol2,tcol3 = st.columns([1,3,1])
-    
+
+    # Set image title and header
     tcol2.image("https://i.postimg.cc/wB32R5J1/Gbanner.png")
     tcol2.title('Gitcoin Grants Impact Dashboard')
     tcol2.markdown('### Your support for Gitcoin Grants has a story. Let\'s reveal it together.')
-        
+
+    # Load the configuration file (GS GG Rounds) that identifies what rounds to include in the statistics
     folder_path = './data'
     lookup_df = pd.read_csv('./GS GG Rounds.csv')
     lookup_df['Start Date'] = pd.to_datetime(lookup_df['Start Date']).dt.tz_localize(None)
     lookup_df['End Date'] = pd.to_datetime(lookup_df['End Date']).dt.tz_localize(None)
     lookup_df['ID'] = lookup_df['ID'].str.lower()
     
-    #query_params = st.query_params.get_all('address')
-
-    #if len(query_params) == 1:
-    #    address = query_params[0]
-    #    tcol2.text_input('Enter your Ethereum address below to uncover your unique impact story (starting "0x"):', 
-    #                               value = query_params[0],
-    #                               help='ENS not supported, please enter 42-character hexadecimal address starting with "0x"')    
-    #else:
-    #    address = tcol2.text_input('Enter your Ethereum address below to uncover your unique impact story (starting "0x"):', 
-    #                                     help='ENS not supported, please enter 42-character hexadecimal address starting with "0x"')
-
     # Initialize session state for address if not already set
     if 'address' not in st.session_state:
         st.session_state.address = None
     
-    # Check if address is provided in the URL
+    # Check if the address is provided in the URL
     query_params = st.query_params.get_all('address')
     if len(query_params) == 1 and not st.session_state.address:
         # Set the initial address from the URL in session state
@@ -254,9 +361,10 @@ def main():
     # Now, use the address from the session state for further processing
     address = st.session_state.address
 
-    #tcol2.button('Reset', on_click=open_page, args=('https://gg-your-impact.streamlit.app/',))
     if address and address != 'None':
         my_bar = tcol2.progress(0, text='Looking up! Please wait.')
+        
+        # Validate the syntax for the address
         if not re.match(r'^(0x)?[0-9a-f]{40}$', address, flags=re.IGNORECASE):
             tcol2.error('Not a valid address. Please enter a valid 42-character hexadecimal Ethereum address starting with "0x"')
             my_bar.empty()
@@ -272,8 +380,13 @@ def main():
 
                 # Rationalize round names
                 all_df[['Round Name', 'Aggregate Name']] = all_df.apply(lambda row: update_for_cgrants_alpha(row, lookup_df) if row['Source'] in ['CGrants', 'Alpha'] else update_for_grantsstack(row, lookup_df), axis=1)
-                # Adding the 'GG' column to indentify if the contribution is for a Gitcoin Grant
+                # Adding the 'GG' column to identify if the contribution is for a Gitcoin Grant
                 all_df['GG'] = all_df['Aggregate Name'].apply(lambda x: 'N' if pd.isna(x) or x == '' else 'Y')
+
+                # Due to missing Tx Timestamp on GG20, default to day 1 for cumulative dashboard reporting
+                default_date = pd.Timestamp('2024-04-23')
+                mask = (all_df['Tx Timestamp'].isna()) & (all_df['Aggregate Name'] == 'GG20')
+                all_df.loc[mask, 'Tx Timestamp'] = default_date
 
                 final_df = all_df[all_df['GG'] == 'Y']
                 not_ggrant_df = all_df[all_df['GG'] == 'N']
@@ -358,7 +471,7 @@ def main():
                         st.success("### Journey of Giving - Your Detailed Donation History")
                         st.caption("Click on the download button to save as .csv file")
                         display_df = display_donation_history(final_df)
-                        st.dataframe(display_df, hide_index=True, use_container_width=True)
+                        st.dataframe(display_df[['Project Name','AmountUSD','Round Name']], hide_index=True, use_container_width=True)
                         donation_csv = display_df.to_csv(index=False)
                         st.download_button(
                             label="Download data as CSV",
@@ -382,15 +495,50 @@ def main():
                         top_5_rounds = top_5_rounds.drop(columns='GG')
                         top_5_rounds['AmountUSD'] = top_5_rounds['AmountUSD'].apply(lambda x: f"${x:,.2f}")
                         st.dataframe(top_5_rounds,hide_index=True, use_container_width=True)
-
-                        my_bar.progress(70,"🫡 thank you for your support to Gitcoin Grants. Check out your stats below while we build your personalized recommendations list for future rounds!")
+                        
+                        #my_bar.progress(70,"🫡 thank you for your support to Gitcoin Grants. Check out your stats below while we build your personalized recommendations list for future rounds!")
                         # Recommendations
-                        recommendations = get_recommendations(folder_path, address)
+                        #recommendations = get_recommendations(folder_path, address)
+                        #st.markdown("#")
+                        #st.success("### Curated Opportunities: Your Next Potential Grantees")
+                        #st.caption("We pulled a list of recommended grantees for you based on contributors' choices who support the projects you support the most.")
+                        #st.caption("The projects listed below have received the most support from donors over the last 12 months, who also contributed to the top three projects you have most supported.")
+                        #st.dataframe(recommendations, hide_index=True, use_container_width=True)
+
+                        # Show favorite projects participating in GG20
                         st.markdown("#")
-                        st.success("### Curated Opportunities: Your Next Potential Grantees")
-                        st.caption("We pulled a list of recommended grantees for you based on contributors' choices who support the projects you support the most.")
-                        st.caption("The projects listed below have received the most support from donors over the last 12 months, who also contributed to the top three projects you have most supported.")
-                        st.dataframe(recommendations, hide_index=True, use_container_width=True)
+                        st.success("### Rediscover Your Favorites in GG20")
+                        st.caption("Below is a list of projects you've previously supported and are participating in GG20. \
+                            Consider showing your support again! For projects you've recently backed in GG20, you'll see a ✅.")
+                            
+                        st.caption("Please note: There may be a one-day delay in reflecting your latest contributions.\
+                            If a project you have previously supported has a new payout address, it may not appear in this list.")
+
+                        # Exclude donations in GG20 before finding most supported projects
+                        filtered_df = final_df[final_df['Aggregate Name'] != 'GG20']
+
+                        top_donations = filtered_df.groupby('PayoutAddress').agg({'AmountUSD': 'sum'}).reset_index()
+                        
+                        top_recos = get_recommendations_gg20(top_donations, address)
+                        
+                        
+                        # Filter the DataFrame to include only the necessary columns
+                        display_df = top_recos[['Project Name', 'Round Name', 'Donated', 'link']]
+                        
+                        # Modify the 'Donated' column to display a checkmark or URL
+                        display_df['Donated in GG20'] = display_df.apply(
+                            lambda row: '✅' if row['Donated'] == 'Yes' else "", axis=1
+                        )
+                        
+                        st.dataframe(
+                            display_df,
+                            hide_index=True, 
+                            use_container_width=True,
+                            column_order=("Project Name","Round Name", "link", "Donated in GG20"),
+                            column_config={
+                                "link": st.column_config.LinkColumn("Explorer Link", display_text="View Project")    
+                            }
+                        )                    
 
                         my_bar.empty()
 
