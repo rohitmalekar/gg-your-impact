@@ -26,6 +26,7 @@ indexer_db_password = st.secrets['INDEXER_DB_PASSWORD']
 @st.cache_data
 def load_data(folder_path, address):
 
+
     # Gets GG1 through GG19 data
     query_1 = """
     SELECT d."round_num" AS "Round Num",
