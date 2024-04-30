@@ -51,7 +51,7 @@ def load_data(folder_path, address):
         "chain_data_63"."donations"."donor_address" AS "Voter",
         "chain_data_63"."donations"."amount_in_usd" AS "AmountUSD",
          "chain_data_63"."donations"."recipient_address" AS "PayoutAddress",
-        '' as "Tx Timestamp",
+        "chain_data_63"."donations"."timestamp" as "Tx Timestamp",
         ("chain_data_63"."applications"."metadata"#>>array [ 'application','project','title' ]::text [])::text AS "Project Name",
         "chain_data_63"."rounds"."id" AS "Round Address",
         'GrantsStack' AS "Source"
@@ -384,9 +384,9 @@ def main():
                 all_df['GG'] = all_df['Aggregate Name'].apply(lambda x: 'N' if pd.isna(x) or x == '' else 'Y')
 
                 # Due to missing Tx Timestamp on GG20, default to day 1 for cumulative dashboard reporting
-                default_date = pd.Timestamp('2024-04-23')
-                mask = (all_df['Tx Timestamp'].isna()) & (all_df['Aggregate Name'] == 'GG20')
-                all_df.loc[mask, 'Tx Timestamp'] = default_date
+                # default_date = pd.Timestamp('2024-04-23')
+                # mask = (all_df['Tx Timestamp'].isna()) & (all_df['Aggregate Name'] == 'GG20')
+                # all_df.loc[mask, 'Tx Timestamp'] = default_date
 
                 final_df = all_df[all_df['GG'] == 'Y']
                 not_ggrant_df = all_df[all_df['GG'] == 'N']
