@@ -23,7 +23,6 @@ indexer_db_name = st.secrets['INDEXER_DB_NAME']
 indexer_db_username = st.secrets['INDEXER_DB_USERNAME']
 indexer_db_password = st.secrets['INDEXER_DB_PASSWORD']
 
-@st.cache_data
 def load_data(folder_path, address):
 
 
