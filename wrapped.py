@@ -259,7 +259,7 @@ def main():
                         Tweet
                         </a>
                         <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-                    
+                    """
                     
                     with tcol2:
                         components.html(html_content)
