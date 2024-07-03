@@ -366,8 +366,6 @@ def main():
                         st.dataframe(top_5_rounds,hide_index=True, use_container_width=True)
 
                         """
-                        # 03-JUL-2023: Commenting recommendations logic, to be refactored using project_lookup in gg21
-
                         # Show favorite projects participating in GG20
                         st.markdown("#")
                         st.success("### Rediscover Your Favorites in GG20")
