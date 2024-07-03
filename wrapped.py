@@ -163,7 +163,7 @@ def create_sunburst_chart(dataframe):
     # Create the sunburst chart
     fig = px.sunburst(
         dataframe,
-        path=['Aggregate Name', 'Project Name'],  # Define hierarchy
+        path=['Round Num', 'Project Name'],  # Define hierarchy
         values='AmountUSD',
         color='AmountUSD',  # Optional: sectors colored based on 'AmountUSD'
         color_continuous_scale=[[0, '#C4F091'], [0.25, '#8EDA93'], [0.5, '#4A9A82'], [0.75, '#16626A'], [1, '#00433B']]
@@ -421,7 +421,7 @@ def main():
                             If a project you have previously supported has a new payout address, it may not appear in this list.")
 
                         # Exclude donations in GG20 before finding most supported projects
-                        filtered_df = final_df[final_df['Aggregate Name'] != 'GG20']
+                        filtered_df = final_df[final_df['Round Num'] != '20']
 
                         top_donations = filtered_df.groupby('PayoutAddress').agg({'AmountUSD': 'sum'}).reset_index()
                         
