@@ -37,7 +37,7 @@ def load_data(address):
            d."project_name" AS "Project Name",
            d."source" AS "Source"
     FROM all_donations d
-    WHERE lower(d."voter") = lower(%s)
+    WHERE lower(d."donor_address") = lower(%s)
     """
 
     # Gets GG20 data
