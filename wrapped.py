@@ -157,31 +157,8 @@ def display_top_projects_treemap(final_df):
 
     fig.update_layout(width=750, height=750)
     return fig
-    
-"""
-def update_for_cgrants_alpha(row, lookup_df):
-    if row['Source'] in ['CGrants', 'Alpha']:
-        # Filter lookup rows where 'Start Date' is before the 'Tx Timestamp'        
-        valid_lookups = lookup_df[(lookup_df['Start Date'] <= row['Tx Timestamp']) & (lookup_df['End Date'] >= row['Tx Timestamp'])]
-        
-        if not valid_lookups.empty:
-            # Find the closest 'Start Date'
-            closest_row = valid_lookups.iloc[(valid_lookups['Start Date'] - row['Tx Timestamp']).abs().argsort()[:1]]
-            return pd.Series([closest_row['Round Name'].values[0], closest_row['Aggregate Name'].values[0]])
-    
-    return pd.Series([row['Round Name'], None])  # Return original Round Name and None if no update
-
-def update_for_grantsstack(row, lookup_df):
-    if row['Source'] == 'GrantsStack':
-        match = lookup_df[lookup_df['ID'] == row['Round Address']]
-        if not match.empty:
-            return pd.Series([match['Round Name'].values[0], match['Aggregate Name'].values[0]])
-    
-    return pd.Series([row['Round Name'], None])  # Return original Round Name and None if no update
-"""
 
 def create_sunburst_chart(dataframe):
-
     
     # Create the sunburst chart
     fig = px.sunburst(
@@ -194,79 +171,6 @@ def create_sunburst_chart(dataframe):
     fig.update_layout(width=1000, height=1000)
     return fig
 
-"""
-@st.cache_data
-def get_recommendations(folder_path, voter):
-    all_dfs = []
-    for filename in os.listdir(folder_path):
-        if filename.endswith('.csv'):
-            df = pd.read_csv(os.path.join(folder_path, filename))
-            all_dfs.append(df)
-
-    GG_round_addresses_df = pd.read_csv('./GS GG Rounds.csv')
-
-    all_data = pd.concat(all_dfs, ignore_index=True)
-    # Convert 'Voter' to lowercase for case-insensitive comparison
-    df_lower = all_data.copy()
-    del all_data
-    df_lower['Voter'] = df_lower['Voter'].str.lower()
-    df_lower['Tx Timestamp'] = pd.to_datetime(df_lower['Tx Timestamp'],format='mixed')
-
-    # Convert both 'Round Address' in df_lower and 'ID' in known_round_addresses_df to lowercase for comparison
-    df_lower['Round Address'] = df_lower['Round Address'].str.lower()
-    GG_round_addresses_df['ID'] = GG_round_addresses_df['ID'].str.lower()
-
-    # Now perform the isin check with both fields in lowercase
-    df_lower = df_lower[df_lower['Round Address'].isin(GG_round_addresses_df['ID'])]
-
-    #st.dataframe(GG_round_addresses_df)
-    #st.dataframe(df_lower.head(10))
-
-    voter_lower = voter.lower()
-
-    # Step 1: Find the 3 most supported projects by the user
-    top_addresses = df_lower[df_lower['Voter'] == voter_lower].groupby('PayoutAddress').agg({'AmountUSD': 'sum'}).reset_index().sort_values('AmountUSD', ascending=False).head(3)
-    #st.write("Step 1: Top Addresses")
-    #st.dataframe(top_addresses)
-
-    # Step 2: Modification here to extract just the list of voters
-    # Define the date 12 months ago from the current time
-    twelve_months_ago = datetime.now(pytz.utc) - timedelta(days=365)
-
-    # Now perform the comparison
-    recent_transactions = df_lower[df_lower['Tx Timestamp'] > twelve_months_ago]
-    other_voters = recent_transactions[recent_transactions['PayoutAddress'].isin(top_addresses['PayoutAddress']) & (recent_transactions['Voter'] != voter_lower)]
-    unique_other_voters = other_voters['Voter'].drop_duplicates()
-    #st.write("Step 2: Other Voters in the Last 12 Months")
-    #st.dataframe(unique_other_voters)
-
-    # Step 3
-    # Filter the DataFrame to include only rows from unique other voters
-    filtered_by_voters = df_lower[df_lower['Voter'].isin(unique_other_voters)]
-
-    # Aggregate contributions by PayoutAddress among these voters and sort them
-    top_supports_by_other_voters = filtered_by_voters.groupby('PayoutAddress') \
-                                                     .agg({'AmountUSD': 'sum'}) \
-                                                     .reset_index() \
-                                                     .sort_values('AmountUSD', ascending=False)
-
-    #st.write("Step 3: Top Payout Addresses Supported by Other Unique Voters")
-    #st.dataframe(top_supports_by_other_voters.head(10))
-
-    # Step 4
-    voter_addresses = df_lower[df_lower['Voter'] == voter_lower]['PayoutAddress'].unique()
-    recommended_addresses = top_supports_by_other_voters[~top_supports_by_other_voters['PayoutAddress'].isin(voter_addresses)].head(10)
-    #st.write("Step 4: Recommended Addresses")
-    #st.dataframe(recommended_addresses)
-
-    # Step 5
-    df_unique = df_lower.drop_duplicates(subset='PayoutAddress')
-    recommended_projects = recommended_addresses.merge(df_unique[['PayoutAddress', 'Project Name']].drop_duplicates(), on='PayoutAddress', how='left')
-    #st.write("Step 5: Recommended Projects")
-    #st.dataframe(recommended_projects['Project Name'])
-
-    return recommended_projects[['Project Name']]
-"""
 
 def get_recommendations_gg20(df,address):
     
