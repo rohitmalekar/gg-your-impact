@@ -312,27 +312,6 @@ def main():
                         
                         my_bar.empty()
 
-                        # Social Sharing
-                        
-                        tcol2.markdown("🌟 **Share Your Impact!** 🌍 Let the world know how you've contributed to the open-source ecosystem and beyond with Gitcoin Grants. Inspire others with your journey! 💫")
-                        
-                        # Insert the custom URL into the HTML string using string formatting
-                        html_content = f"""
-                        <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" 
-                        data-text="I\'ve been a part of curating and signaling the next generation of high-impact projects through @gitcoin Grants 🫡 Join me and share your impact today! Check out my #ggwrapped Impact Dashboard " 
-                        data-url="{custom_url}"
-                        data-show-count="false"
-                        data-size="Large" 
-                        height=10
-                        Tweet
-                        </a>
-                        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-                        """
-                        
-                        with tcol2:
-                            components.html(html_content)
-
-
                 else:
                     my_bar.empty()
                     tcol2.write("While there are contributions made from this address on Grants Stack, no contribution data found for Gitcoin Grants.")                    
