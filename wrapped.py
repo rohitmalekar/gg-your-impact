@@ -359,14 +359,14 @@ def main():
                         grouped_df = all_df.groupby(['Round Name', 'GG'])['AmountUSD'].sum().reset_index()
                         not_gg_df = grouped_df[grouped_df['GG'] == 'N']
 
-                        """
-                        # 03-JUL-2023: Commenting recommendations logic, to be refactored using project_lookup in gg21
-                        
                         # Select the top 5 entries based on 'Round Name' and 'AmountUSD'
                         top_5_rounds = not_gg_df.sort_values('AmountUSD', ascending=False).head(5)
                         top_5_rounds = top_5_rounds.drop(columns='GG')
                         top_5_rounds['AmountUSD'] = top_5_rounds['AmountUSD'].apply(lambda x: f"${x:,.2f}")
                         st.dataframe(top_5_rounds,hide_index=True, use_container_width=True)
+
+                        """
+                        # 03-JUL-2023: Commenting recommendations logic, to be refactored using project_lookup in gg21
 
                         # Show favorite projects participating in GG20
                         st.markdown("#")
