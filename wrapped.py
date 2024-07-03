@@ -45,36 +45,36 @@ def load_data(folder_path, address):
     # Gets GG20 data
     query_2 = """
     SELECT
-        "chain_data_63"."donations"."round_id" AS "Round Num",
-        ("chain_data_63"."rounds"."round_metadata" #>> array [ 'name' ] :: text [ ]) :: text AS "Round Name",
-        "chain_data_63"."donations"."donor_address" AS "Voter",
-        "chain_data_63"."donations"."amount_in_usd" AS "AmountUSD",
-         "chain_data_63"."donations"."recipient_address" AS "PayoutAddress",
-        "chain_data_63"."donations"."timestamp" as "Tx Timestamp",
-        ("chain_data_63"."applications"."metadata"#>>array [ 'application','project','title' ]::text [])::text AS "Project Name",
-        "chain_data_63"."rounds"."id" AS "Round Address",
+        "chain_data_65"."donations"."round_id" AS "Round Num",
+        ("chain_data_65"."rounds"."round_metadata" #>> array [ 'name' ] :: text [ ]) :: text AS "Round Name",
+        "chain_data_65"."donations"."donor_address" AS "Voter",
+        "chain_data_65"."donations"."amount_in_usd" AS "AmountUSD",
+         "chain_data_65"."donations"."recipient_address" AS "PayoutAddress",
+        "chain_data_65"."donations"."timestamp" as "Tx Timestamp",
+        ("chain_data_65"."applications"."metadata"#>>array [ 'application','project','title' ]::text [])::text AS "Project Name",
+        "chain_data_65"."rounds"."id" AS "Round Address",
         'GrantsStack' AS "Source"
     FROM
-        "chain_data_63"."rounds",
-        "chain_data_63"."applications",
-        "chain_data_63"."donations"
+        "chain_data_65"."rounds",
+        "chain_data_65"."applications",
+        "chain_data_65"."donations"
     where
         -- filter for GG20 rounds
         (
-            ("chain_data_63"."rounds"."chain_id" = '42161' AND "chain_data_63"."rounds"."id"  IN ('23','24','25','26','27','28','29','31'))
+            ("chain_data_65"."rounds"."chain_id" = '42161' AND "chain_data_65"."rounds"."id"  IN ('23','24','25','26','27','28','29','31'))
         or
-            ("chain_data_63"."rounds"."chain_id" = '10' AND "chain_data_63"."rounds"."id"  IN ('9'))
+            ("chain_data_65"."rounds"."chain_id" = '10' AND "chain_data_65"."rounds"."id"  IN ('9'))
         )
         AND
         -- Join applications and rounds
-        "chain_data_63"."applications"."round_id" = "chain_data_63"."rounds"."id" AND 
-        "chain_data_63"."applications"."chain_id" = "chain_data_63"."rounds"."chain_id" AND
+        "chain_data_65"."applications"."round_id" = "chain_data_65"."rounds"."id" AND 
+        "chain_data_65"."applications"."chain_id" = "chain_data_65"."rounds"."chain_id" AND
         -- Join applications and donations
-        "chain_data_63"."applications"."chain_id"  = "chain_data_63"."donations"."chain_id" AND
-        "chain_data_63"."applications"."round_id"  = "chain_data_63"."donations"."round_id" AND 
-        "chain_data_63"."applications"."id"  = "chain_data_63"."donations"."application_id" AND
+        "chain_data_65"."applications"."chain_id"  = "chain_data_65"."donations"."chain_id" AND
+        "chain_data_65"."applications"."round_id"  = "chain_data_65"."donations"."round_id" AND 
+        "chain_data_65"."applications"."id"  = "chain_data_65"."donations"."application_id" AND
         -- Filter on user's address
-        lower("chain_data_63"."donations"."donor_address") = lower(%s)
+        lower("chain_data_65"."donations"."donor_address") = lower(%s)
     """
 
     # Connect to the PostgreSQL database
@@ -271,39 +271,39 @@ def get_recommendations_gg20(df,address):
     # Find participating project in GG20
     query = """
         SELECT      
-            CONCAT('https://explorer.gitcoin.co/#/round/',"chain_data_63"."rounds"."chain_id",'/',"chain_data_63"."rounds"."id",'/',"chain_data_63"."applications"."id") as Link,
-            ("chain_data_63"."applications"."metadata"#>>array [ 'application','project','title' ]::text [])::text AS "Project Name",
-            ("chain_data_63"."rounds"."round_metadata" #>> array [ 'name' ] :: text [ ]) :: text AS "Round Name",
-            "chain_data_63"."rounds"."chain_id" as "Chain ID",
-            "chain_data_63"."rounds"."id" as "Round ID",
-            "chain_data_63"."applications"."id" as "Application ID",
-            lower(("chain_data_63"."applications"."metadata"#>>array [ 'application','recipient' ]::text [])::text) AS "PayoutAddress",
+            CONCAT('https://explorer.gitcoin.co/#/round/',"chain_data_65"."rounds"."chain_id",'/',"chain_data_65"."rounds"."id",'/',"chain_data_65"."applications"."id") as Link,
+            ("chain_data_65"."applications"."metadata"#>>array [ 'application','project','title' ]::text [])::text AS "Project Name",
+            ("chain_data_65"."rounds"."round_metadata" #>> array [ 'name' ] :: text [ ]) :: text AS "Round Name",
+            "chain_data_65"."rounds"."chain_id" as "Chain ID",
+            "chain_data_65"."rounds"."id" as "Round ID",
+            "chain_data_65"."applications"."id" as "Application ID",
+            lower(("chain_data_65"."applications"."metadata"#>>array [ 'application','recipient' ]::text [])::text) AS "PayoutAddress",
             CASE 
-                WHEN "chain_data_63"."donations"."donor_address" IS NOT NULL
+                WHEN "chain_data_65"."donations"."donor_address" IS NOT NULL
                 THEN 'Yes'
             ELSE 'No'
             END AS "Donated"
         FROM
-            "chain_data_63"."rounds" 
+            "chain_data_65"."rounds" 
             JOIN
-            "chain_data_63"."applications" 
+            "chain_data_65"."applications" 
         ON
-            "chain_data_63"."applications"."round_id" = "chain_data_63"."rounds"."id" AND 
-            "chain_data_63"."applications"."chain_id" = "chain_data_63"."rounds"."chain_id" AND
-            "chain_data_63"."applications"."status" = 'APPROVED'
+            "chain_data_65"."applications"."round_id" = "chain_data_65"."rounds"."id" AND 
+            "chain_data_65"."applications"."chain_id" = "chain_data_65"."rounds"."chain_id" AND
+            "chain_data_65"."applications"."status" = 'APPROVED'
         LEFT OUTER JOIN
-            "chain_data_63"."donations"
+            "chain_data_65"."donations"
         ON
-            "chain_data_63"."applications"."chain_id"  = "chain_data_63"."donations"."chain_id" AND
-            "chain_data_63"."applications"."round_id"  = "chain_data_63"."donations"."round_id" AND 
-            "chain_data_63"."applications"."id"  = "chain_data_63"."donations"."application_id" AND
-            lower("chain_data_63"."donations"."donor_address") = lower(%s)
+            "chain_data_65"."applications"."chain_id"  = "chain_data_65"."donations"."chain_id" AND
+            "chain_data_65"."applications"."round_id"  = "chain_data_65"."donations"."round_id" AND 
+            "chain_data_65"."applications"."id"  = "chain_data_65"."donations"."application_id" AND
+            lower("chain_data_65"."donations"."donor_address") = lower(%s)
         WHERE    
             -- filter for GG20 rounds
             (
-                ("chain_data_63"."rounds"."chain_id" = '42161' AND "chain_data_63"."rounds"."id"  IN ('23','24','25','26','27','28','29','31'))
+                ("chain_data_65"."rounds"."chain_id" = '42161' AND "chain_data_65"."rounds"."id"  IN ('23','24','25','26','27','28','29','31'))
             or
-                ("chain_data_63"."rounds"."chain_id" = '10' AND "chain_data_63"."rounds"."id"  IN ('9'))
+                ("chain_data_65"."rounds"."chain_id" = '10' AND "chain_data_65"."rounds"."id"  IN ('9'))
             )
       """      
 
