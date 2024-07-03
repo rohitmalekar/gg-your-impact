@@ -135,61 +135,6 @@ def create_sunburst_chart(dataframe):
     return fig
 
 
-def get_recommendations_gg20(df,address):
-    
-    # Find participating project in GG20
-    query = """
-        SELECT      
-            CONCAT('https://explorer.gitcoin.co/#/round/',"chain_data_65"."rounds"."chain_id",'/',"chain_data_65"."rounds"."id",'/',"chain_data_65"."applications"."id") as Link,
-            ("chain_data_65"."applications"."metadata"#>>array [ 'application','project','title' ]::text [])::text AS "Project Name",
-            ("chain_data_65"."rounds"."round_metadata" #>> array [ 'name' ] :: text [ ]) :: text AS "Round Name",
-            "chain_data_65"."rounds"."chain_id" as "Chain ID",
-            "chain_data_65"."rounds"."id" as "Round ID",
-            "chain_data_65"."applications"."id" as "Application ID",
-            lower(("chain_data_65"."applications"."metadata"#>>array [ 'application','recipient' ]::text [])::text) AS "PayoutAddress",
-            CASE 
-                WHEN "chain_data_65"."donations"."donor_address" IS NOT NULL
-                THEN 'Yes'
-            ELSE 'No'
-            END AS "Donated"
-        FROM
-            "chain_data_65"."rounds" 
-            JOIN
-            "chain_data_65"."applications" 
-        ON
-            "chain_data_65"."applications"."round_id" = "chain_data_65"."rounds"."id" AND 
-            "chain_data_65"."applications"."chain_id" = "chain_data_65"."rounds"."chain_id" AND
-            "chain_data_65"."applications"."status" = 'APPROVED'
-        LEFT OUTER JOIN
-            "chain_data_65"."donations"
-        ON
-            "chain_data_65"."applications"."chain_id"  = "chain_data_65"."donations"."chain_id" AND
-            "chain_data_65"."applications"."round_id"  = "chain_data_65"."donations"."round_id" AND 
-            "chain_data_65"."applications"."id"  = "chain_data_65"."donations"."application_id" AND
-            lower("chain_data_65"."donations"."donor_address") = lower(%s)
-        WHERE    
-            -- filter for GG20 rounds
-            (
-                ("chain_data_65"."rounds"."chain_id" = '42161' AND "chain_data_65"."rounds"."id"  IN ('23','24','25','26','27','28','29','31'))
-            or
-                ("chain_data_65"."rounds"."chain_id" = '10' AND "chain_data_65"."rounds"."id"  IN ('9'))
-            )
-      """      
-
-    indexer_conn = pg.connect(host=indexer_db_host, port=indexer_db_port, dbname=indexer_db_name, user=indexer_db_username, password=indexer_db_password)
-    gg20_df = pd.read_sql_query(query, indexer_conn, params=(address.lower(),))
-
-    #mask = gg20_df['PayoutAddress'].isin(df['PayoutAddress'])
-    #filtered_gg20_df = gg20_df[mask]
-
-    # Merge gg20 data with user's donation history
-    merged_df = pd.merge(gg20_df, df[['PayoutAddress', 'AmountUSD']], on='PayoutAddress', how='inner')
-    
-    # Sort the merged DataFrame based on the AmountUSD column
-    sorted_merged_df = merged_df.sort_values(by='AmountUSD', ascending=False)
-    
-    return sorted_merged_df
-
 # Main function to orchestrate the workflow
 def main():
     # Set the columns for display
@@ -364,44 +309,6 @@ def main():
                         top_5_rounds = top_5_rounds.drop(columns='GG')
                         top_5_rounds['AmountUSD'] = top_5_rounds['AmountUSD'].apply(lambda x: f"${x:,.2f}")
                         st.dataframe(top_5_rounds,hide_index=True, use_container_width=True)
-
-                        """
-                        # Show favorite projects participating in GG20
-                        st.markdown("#")
-                        st.success("### Rediscover Your Favorites in GG20")
-                        st.caption("Below is a list of projects you've previously supported and are participating in GG20. \
-                            Consider showing your support again! For projects you've recently backed in GG20, you'll see a ✅.")
-                            
-                        st.caption("Please note: There may be a one-day delay in reflecting your latest contributions.\
-                            If a project you have previously supported has a new payout address, it may not appear in this list.")
-
-                        # Exclude donations in GG20 before finding most supported projects
-                        filtered_df = final_df[final_df['Round Num'] != '20']
-
-                        top_donations = filtered_df.groupby('PayoutAddress').agg({'AmountUSD': 'sum'}).reset_index()
-                        
-                        top_recos = get_recommendations_gg20(top_donations, address)
-
-                        # Filter the DataFrame to include only the necessary columns
-                        display_df = top_recos[['Project Name', 'Round Name', 'Donated', 'link']]
-                        
-                        # Prefix 'Project Name' with a checkmark if 'Donated' is 'Yes'
-                        display_df['Project Name'] = display_df.apply(
-                            lambda row: '✅ ' + row['Project Name'] if row['Donated'] == 'Yes' else row['Project Name'],
-                            axis=1
-                        )
-                        
-                        st.dataframe(
-                            display_df,
-                            hide_index=True, 
-                            use_container_width=True,
-                            column_order=("Project Name","Round Name", "link"),
-                            column_config={
-                                "link": st.column_config.LinkColumn("Explorer Link", display_text="View Project")    
-                            }
-                        )                    
-                        
-                        """
                         
                         my_bar.empty()
 
