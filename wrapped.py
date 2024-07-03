@@ -159,11 +159,14 @@ def display_top_projects_treemap(final_df):
     return fig
 
 def create_sunburst_chart(dataframe):
+
+    # Create a new column with the desired format to showcase round as 'GG' followed by number
+    dataframe['Round Num Formatted'] = dataframe['Round Num'].apply(lambda x: f'GG{int(x)}')
     
     # Create the sunburst chart
     fig = px.sunburst(
         dataframe,
-        path=['Round Num', 'Project Name'],  # Define hierarchy
+        path=['Round Num Formatted', 'Project Name'],  # Define hierarchy
         values='AmountUSD',
         color='AmountUSD',  # Optional: sectors colored based on 'AmountUSD'
         color_continuous_scale=[[0, '#C4F091'], [0.25, '#8EDA93'], [0.5, '#4A9A82'], [0.75, '#16626A'], [1, '#00433B']]
