@@ -40,49 +40,9 @@ def load_data(address):
     WHERE lower(d."donor_address") = lower(%s)
     """
 
-    # Gets GG20 data
-    query_2 = """
-    SELECT
-        "chain_data_65"."donations"."round_id" AS "Round Num",
-        ("chain_data_65"."rounds"."round_metadata" #>> array [ 'name' ] :: text [ ]) :: text AS "Round Name",
-        "chain_data_65"."donations"."donor_address" AS "Voter",
-        "chain_data_65"."donations"."amount_in_usd" AS "AmountUSD",
-         "chain_data_65"."donations"."recipient_address" AS "PayoutAddress",
-        "chain_data_65"."donations"."timestamp" as "Tx Timestamp",
-        ("chain_data_65"."applications"."metadata"#>>array [ 'application','project','title' ]::text [])::text AS "Project Name",
-        "chain_data_65"."rounds"."id" AS "Round Address",
-        'GrantsStack' AS "Source"
-    FROM
-        "chain_data_65"."rounds",
-        "chain_data_65"."applications",
-        "chain_data_65"."donations"
-    where
-        -- filter for GG20 rounds
-        (
-            ("chain_data_65"."rounds"."chain_id" = '42161' AND "chain_data_65"."rounds"."id"  IN ('23','24','25','26','27','28','29','31'))
-        or
-            ("chain_data_65"."rounds"."chain_id" = '10' AND "chain_data_65"."rounds"."id"  IN ('9'))
-        )
-        AND
-        -- Join applications and rounds
-        "chain_data_65"."applications"."round_id" = "chain_data_65"."rounds"."id" AND 
-        "chain_data_65"."applications"."chain_id" = "chain_data_65"."rounds"."chain_id" AND
-        -- Join applications and donations
-        "chain_data_65"."applications"."chain_id"  = "chain_data_65"."donations"."chain_id" AND
-        "chain_data_65"."applications"."round_id"  = "chain_data_65"."donations"."round_id" AND 
-        "chain_data_65"."applications"."id"  = "chain_data_65"."donations"."application_id" AND
-        -- Filter on user's address
-        lower("chain_data_65"."donations"."donor_address") = lower(%s)
-    """
-
     # Connect to the PostgreSQL database
     conn = pg.connect(host=db_host, port=db_port, dbname=db_name, user=db_username, password=db_password)
-    # indexer_conn = pg.connect(host=indexer_db_host, port=indexer_db_port, dbname=indexer_db_name, user=indexer_db_username, password=indexer_db_password)
-    all_dfs = pd.read_sql_query(query_1, conn, params=(address.lower(),))
-    # all_dfs_2 = pd.read_sql_query(query_2, indexer_conn, params=(address.lower(),))
-
-    # all_dfs = pd.concat([all_dfs_1, all_dfs_2], ignore_index=True)
-    
+    all_dfs = pd.read_sql_query(query_1, conn, params=(address.lower(),))    
     conn.close()
 
     return all_dfs if not all_dfs.empty else pd.DataFrame()
@@ -354,7 +314,9 @@ def main():
                         Tweet
                         </a>
                         <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+                    
                     """
+                    # 03-JUL-2023: Commenting recommendations logic, to be refactored using project_lookup in gg21
                     
                     with tcol2:
                         components.html(html_content)
@@ -399,20 +361,13 @@ def main():
                         grouped_df = all_df.groupby(['Round Name', 'GG'])['AmountUSD'].sum().reset_index()
                         not_gg_df = grouped_df[grouped_df['GG'] == 'N']
 
+                        """
+                        
                         # Select the top 5 entries based on 'Round Name' and 'AmountUSD'
                         top_5_rounds = not_gg_df.sort_values('AmountUSD', ascending=False).head(5)
                         top_5_rounds = top_5_rounds.drop(columns='GG')
                         top_5_rounds['AmountUSD'] = top_5_rounds['AmountUSD'].apply(lambda x: f"${x:,.2f}")
                         st.dataframe(top_5_rounds,hide_index=True, use_container_width=True)
-                        
-                        #my_bar.progress(70,"🫡 thank you for your support to Gitcoin Grants. Check out your stats below while we build your personalized recommendations list for future rounds!")
-                        # Recommendations
-                        #recommendations = get_recommendations(folder_path, address)
-                        #st.markdown("#")
-                        #st.success("### Curated Opportunities: Your Next Potential Grantees")
-                        #st.caption("We pulled a list of recommended grantees for you based on contributors' choices who support the projects you support the most.")
-                        #st.caption("The projects listed below have received the most support from donors over the last 12 months, who also contributed to the top three projects you have most supported.")
-                        #st.dataframe(recommendations, hide_index=True, use_container_width=True)
 
                         # Show favorite projects participating in GG20
                         st.markdown("#")
@@ -448,7 +403,9 @@ def main():
                                 "link": st.column_config.LinkColumn("Explorer Link", display_text="View Project")    
                             }
                         )                    
-
+                        
+                        """
+                        
                         my_bar.empty()
 
                         # Social Sharing
