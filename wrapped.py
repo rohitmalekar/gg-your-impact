@@ -23,23 +23,21 @@ indexer_db_name = st.secrets['INDEXER_DB_NAME']
 indexer_db_username = st.secrets['INDEXER_DB_USERNAME']
 indexer_db_password = st.secrets['INDEXER_DB_PASSWORD']
 
-def load_data(folder_path, address):
+def load_data(address):
 
 
     # Gets GG1 through GG19 data
     query_1 = """
     SELECT d."round_num" AS "Round Num",
            d."round_name" AS "Round Name",
-           d."voter" AS "Voter",
-           d."amountUSD" AS "AmountUSD",
-           d."payoutaddress" AS "PayoutAddress",
-           d."tx_timestamp" AS "Tx Timestamp",
-           d."project_name" AS "Project Name",
-           d."round_address" AS "Round Address",
+           d."donor_address" AS "Voter",
+           d."amount_in_usd" AS "AmountUSD",
+           d."recipient_address" AS "PayoutAddress",
+           d."timestamp" AS "Tx Timestamp",
+           d."project_name" AS "Project Name"
            d."source" AS "Source"
     FROM all_donations d
     WHERE lower(d."voter") = lower(%s)
-    LIMIT 1048575
     """
 
     # Gets GG20 data
@@ -79,11 +77,11 @@ def load_data(folder_path, address):
 
     # Connect to the PostgreSQL database
     conn = pg.connect(host=db_host, port=db_port, dbname=db_name, user=db_username, password=db_password)
-    indexer_conn = pg.connect(host=indexer_db_host, port=indexer_db_port, dbname=indexer_db_name, user=indexer_db_username, password=indexer_db_password)
-    all_dfs_1 = pd.read_sql_query(query_1, conn, params=(address.lower(),))
-    all_dfs_2 = pd.read_sql_query(query_2, indexer_conn, params=(address.lower(),))
+    # indexer_conn = pg.connect(host=indexer_db_host, port=indexer_db_port, dbname=indexer_db_name, user=indexer_db_username, password=indexer_db_password)
+    all_dfs = pd.read_sql_query(query_1, conn, params=(address.lower(),))
+    # all_dfs_2 = pd.read_sql_query(query_2, indexer_conn, params=(address.lower(),))
 
-    all_dfs = pd.concat([all_dfs_1, all_dfs_2], ignore_index=True)
+    # all_dfs = pd.concat([all_dfs_1, all_dfs_2], ignore_index=True)
     
     conn.close()
 
@@ -159,7 +157,8 @@ def display_top_projects_treemap(final_df):
 
     fig.update_layout(width=750, height=750)
     return fig
-
+    
+"""
 def update_for_cgrants_alpha(row, lookup_df):
     if row['Source'] in ['CGrants', 'Alpha']:
         # Filter lookup rows where 'Start Date' is before the 'Tx Timestamp'        
@@ -179,6 +178,7 @@ def update_for_grantsstack(row, lookup_df):
             return pd.Series([match['Round Name'].values[0], match['Aggregate Name'].values[0]])
     
     return pd.Series([row['Round Name'], None])  # Return original Round Name and None if no update
+"""
 
 def create_sunburst_chart(dataframe):
 
@@ -194,6 +194,7 @@ def create_sunburst_chart(dataframe):
     fig.update_layout(width=1000, height=1000)
     return fig
 
+"""
 @st.cache_data
 def get_recommendations(folder_path, voter):
     all_dfs = []
@@ -265,6 +266,7 @@ def get_recommendations(folder_path, voter):
     #st.dataframe(recommended_projects['Project Name'])
 
     return recommended_projects[['Project Name']]
+"""
 
 def get_recommendations_gg20(df,address):
     
@@ -371,16 +373,17 @@ def main():
             my_bar.progress(10, "Valid address found. Searching your contributions...brb.")
 
             # Get all contributions associated with the address
-            all_df = load_data(folder_path, address)
+            all_df = load_data(address)
             
             if not all_df.empty:
                 #final_df['Tx Timestamp'] = pd.to_datetime(final_df['Tx Timestamp'], format='mixed')
                 all_df['Tx Timestamp'] = pd.to_datetime(all_df['Tx Timestamp'], format='mixed').dt.tz_localize(None)
 
                 # Rationalize round names
-                all_df[['Round Name', 'Aggregate Name']] = all_df.apply(lambda row: update_for_cgrants_alpha(row, lookup_df) if row['Source'] in ['CGrants', 'Alpha'] else update_for_grantsstack(row, lookup_df), axis=1)
+                # all_df[['Round Name', 'Aggregate Name']] = all_df.apply(lambda row: update_for_cgrants_alpha(row, lookup_df) if row['Source'] in ['CGrants', 'Alpha'] else update_for_grantsstack(row, lookup_df), axis=1)
                 # Adding the 'GG' column to identify if the contribution is for a Gitcoin Grant
-                all_df['GG'] = all_df['Aggregate Name'].apply(lambda x: 'N' if pd.isna(x) or x == '' else 'Y')
+                #all_df['GG'] = all_df['Aggregate Name'].apply(lambda x: 'N' if pd.isna(x) or x == '' else 'Y')
+                all_df['GG'] = all_df['Round Num'].apply(lambda x: 'Y' if pd.notna(x) else 'N')
 
                 # Due to missing Tx Timestamp on GG20, default to day 1 for cumulative dashboard reporting
                 # default_date = pd.Timestamp('2024-04-23')
