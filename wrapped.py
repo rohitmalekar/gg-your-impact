@@ -315,8 +315,6 @@ def main():
                         </a>
                         <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
                     
-                    """
-                    # 03-JUL-2023: Commenting recommendations logic, to be refactored using project_lookup in gg21
                     
                     with tcol2:
                         components.html(html_content)
@@ -362,6 +360,7 @@ def main():
                         not_gg_df = grouped_df[grouped_df['GG'] == 'N']
 
                         """
+                        # 03-JUL-2023: Commenting recommendations logic, to be refactored using project_lookup in gg21
                         
                         # Select the top 5 entries based on 'Round Name' and 'AmountUSD'
                         top_5_rounds = not_gg_df.sort_values('AmountUSD', ascending=False).head(5)
