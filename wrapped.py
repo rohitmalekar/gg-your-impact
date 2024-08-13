@@ -36,7 +36,7 @@ def load_data(address):
            d."timestamp" AS "Tx Timestamp",
            d."project_name" AS "Project Name",
            d."source" AS "Source"
-    FROM all_donations d
+    FROM "public"."all_donations" d
     WHERE lower(d."donor_address") = lower(%s)
     """
 
