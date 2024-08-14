@@ -10,6 +10,7 @@ import pytz
 import streamlit.components.v1 as components
 import psycopg2 as pg
 
+
 # Now you can use os.getenv to access your variables
 db_host= st.secrets['DB_HOST']
 db_port = st.secrets['DB_PORT']
