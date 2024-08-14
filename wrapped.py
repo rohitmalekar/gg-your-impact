@@ -92,7 +92,7 @@ def create_heatmap(final_df):
     return fig
 
 def display_donation_history(final_df):
-    desired_columns = ['Project Name', 'AmountUSD', 'Tx Timestamp', 'Round Name']
+    desired_columns = ['Project Name', 'AmountUSD', 'Tx Timestamp', 'Round Name', 'Round Num']
     display_df = final_df[desired_columns].copy()
     display_df['AmountUSD'] = display_df['AmountUSD'].apply(lambda x: f"${x:,.2f}")
     display_df = display_df.sort_values('Tx Timestamp', ascending=False, na_position='first')
@@ -285,7 +285,7 @@ def main():
                         st.success("### Journey of Giving - Your Detailed Donation History")
                         st.caption("Click on the download button to save as .csv file")
                         display_df = display_donation_history(final_df)
-                        st.dataframe(display_df[['Project Name','AmountUSD','Round Name']], hide_index=True, use_container_width=True)
+                        st.dataframe(display_df[['Project Name','AmountUSD','Round Num','Round Name']], hide_index=True, use_container_width=True)
                         donation_csv = display_df.to_csv(index=False)
                         st.download_button(
                             label="Download data as CSV",
