@@ -12,17 +12,12 @@ import psycopg2 as pg
 
 
 # Now you can use os.getenv to access your variables
-db_host= st.secrets['DB_HOST']
-db_port = st.secrets['DB_PORT']
-db_name = st.secrets['DB_NAME']
-db_username = st.secrets['DB_USERNAME']
-db_password = st.secrets['DB_PASSWORD']
+db_host= os.environ.get("DB_HOST")
+db_port = os.environ.get("DB_PORT")
+db_name = os.environ.get("DB_NAME")
+db_username = os.environ.get("DB_USERNAME")
+db_password = os.environ.get("DB_PASSWORD")
 
-indexer_db_host= st.secrets['INDEXER_DB_HOST']
-indexer_db_port = st.secrets['INDEXER_DB_PORT']
-indexer_db_name = st.secrets['INDEXER_DB_NAME']
-indexer_db_username = st.secrets['INDEXER_DB_USERNAME']
-indexer_db_password = st.secrets['INDEXER_DB_PASSWORD']
 
 def load_data(address):
 
